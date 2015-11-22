@@ -16,6 +16,9 @@ public:
     explicit CornersGame(QWidget *parent = 0);
     ~CornersGame();
 
+public slots:
+    void test();
+
 private:
     Ui::CornersGame *ui;
     QGraphicsScene *fieldScene;

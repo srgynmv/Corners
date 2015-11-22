@@ -25,4 +25,5 @@ void myGameFieldView::resizeEvent(QResizeEvent *event)
 
     qDebug() << "NewX: " << newX << " NewY: " << newY;
     this->setGeometry(newX, newY, minSize, minSize);
+    QGraphicsView::resizeEvent(event);
 }
