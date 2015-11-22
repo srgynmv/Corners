@@ -2,6 +2,7 @@
 #define CORNERSGAME_H
 
 #include <QMainWindow>
+#include <QtWidgets>
 
 namespace Ui {
 class CornersGame;
@@ -17,6 +18,7 @@ public:
 
 private:
     Ui::CornersGame *ui;
+    QGraphicsScene *fieldScene;
 };
 
 #endif // CORNERSGAME_H

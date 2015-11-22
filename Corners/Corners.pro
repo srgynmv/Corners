@@ -13,8 +13,10 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        cornersgame.cpp
+        cornersgame.cpp \
+    mygamefieldview.cpp
 
-HEADERS  += cornersgame.h
+HEADERS  += cornersgame.h \
+    mygamefieldview.h
 
 FORMS    += cornersgame.ui
