@@ -17,8 +17,12 @@ int myGameFieldView::heightForWidth(int width) const
 void myGameFieldView::resizeEvent(QResizeEvent *event)
 {
     int minSize = qMin(event->size().height(), event->size().width());
-    qDebug() << "In resizeEvent() with size " << minSize;
     qDebug() << "x: " << this->x() << " y: " << this->y();
-    qDebug() << "parent-x: " << this->parentWidget()->x() << " parent-y: " << this->parentWidget()->y();
-    this->setGeometry(this->x(), this->y(), minSize, minSize);
+    int newY = this->parentWidget()->height() / 2 - minSize / 2;
+    int newX = this->parentWidget()->width() > 1000 ? ((this->parentWidget()->width() - 1000 + 9) - (this->parentWidget()->height() - 600) / 2 - (this->parentWidget()->width() - 1000 + 9) / 3) : this->x();
+
+    newX = newX < 9 ? 9 : newX;
+
+    qDebug() << "NewX: " << newX << " NewY: " << newY;
+    this->setGeometry(newX, newY, minSize, minSize);
 }

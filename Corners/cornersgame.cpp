@@ -15,7 +15,7 @@ CornersGame::CornersGame(QWidget *parent) :
     ui->verticalGameLayout->addWidget(gameFieldView);
     QGraphicsScene *scene = new QGraphicsScene();
     gameFieldView->setScene(scene);
-    scene->addPixmap(QPixmap())
+    scene->addPixmap(QPixmap(":/textures/resources/fieldTexture.jpg"));
 }
 
 

@@ -20,3 +20,9 @@ HEADERS  += cornersgame.h \
     mygamefieldview.h
 
 FORMS    += cornersgame.ui
+
+DISTFILES += \
+    resources/fieldTexture.jpg
+
+RESOURCES += \
+    textures.qrc
