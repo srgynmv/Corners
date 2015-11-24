@@ -6,6 +6,7 @@
 #include <mygamefieldview.h>
 #include <checker.h>
 #include <newgamedialog.h>
+#include <QtDebug>
 
 namespace Ui {
 class CornersGame;

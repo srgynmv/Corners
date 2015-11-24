@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>newGameDialog</class>
- <widget class="QDialog" name="newGameDialog">
+ <class>NewGameDialog</class>
+ <widget class="QDialog" name="NewGameDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>215</width>
-    <height>132</height>
+    <height>133</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -40,7 +40,7 @@
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
       </font>
      </property>
      <property name="text">
@@ -69,17 +69,11 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="locale">
-      <locale language="English" country="UnitedStates"/>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::No|QDialogButtonBox::Yes</set>
-     </property>
-     <property name="centerButtons">
-      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -90,7 +84,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>newGameDialog</receiver>
+   <receiver>NewGameDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -106,7 +100,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>newGameDialog</receiver>
+   <receiver>NewGameDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

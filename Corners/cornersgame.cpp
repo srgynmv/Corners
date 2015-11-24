@@ -2,7 +2,7 @@
 #include "ui_cornersgame.h"
 #include <QtDebug>
 #include <QtWidgets>
-#include <checker.h>
+
 
 CornersGame::CornersGame(QWidget *parent) :
     QMainWindow(parent),
@@ -75,11 +75,16 @@ void CornersGame::newGameClicked()
     }
     else
     {
-        //NewGameDialog
-        for (int i = 0; i < this->numberOfCheckers; ++i)
+        NewGameDialog newGameDialog;
+
+        if (newGameDialog.exec())
         {
-            whiteCheckers[i]->setPos((i % 3) * gameFieldView->cellSize, scene->height() - (i / 3 + 1) * gameFieldView->cellSize - 1);
-            blackCheckers[i]->setPos(scene->width() - (i % 3 + 1) * gameFieldView->cellSize - 1, (i / 3) * gameFieldView->cellSize);
+            qDebug() << "cout";
+            for (int i = 0; i < this->numberOfCheckers; ++i)
+            {
+                whiteCheckers[i]->setPos((i % 3) * gameFieldView->cellSize, scene->height() - (i / 3 + 1) * gameFieldView->cellSize - 1);
+                blackCheckers[i]->setPos(scene->width() - (i % 3 + 1) * gameFieldView->cellSize - 1, (i / 3) * gameFieldView->cellSize);
+            }
         }
     }
 }

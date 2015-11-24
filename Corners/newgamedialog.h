@@ -13,10 +13,10 @@ class NewGameDialog : public QDialog
 
 public:
     explicit NewGameDialog(QWidget *parent = 0);
-    ~newGameDialog();
+    ~NewGameDialog();
 
 private:
-    Ui::newGameDialog *ui;
+    Ui::NewGameDialog *ui;
 };
 
 #endif // NEWGAMEDIALOG_H
