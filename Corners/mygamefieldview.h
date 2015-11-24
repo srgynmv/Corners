@@ -15,6 +15,7 @@ public:
     virtual int heightForWidth(int width) const;
     virtual void resizeEvent(QResizeEvent *event);
     double fieldSize;
+    double cellSize;
 };
 
 #endif // MYGAMEFIELDVIEW_H

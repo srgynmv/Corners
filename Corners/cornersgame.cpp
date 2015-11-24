@@ -2,15 +2,16 @@
 #include "ui_cornersgame.h"
 #include <QtDebug>
 #include <QtWidgets>
+#include <checker.h>
 
 CornersGame::CornersGame(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CornersGame)
 {
     //Setup background and background brush
-    QPixmap fieldTexture(":/textures/resources/fieldTexture.jpg");
+    QPixmap fieldTexture(":/textures/resources/fieldTexture.png");
     QGraphicsPixmapItem *fieldTextureItem = new QGraphicsPixmapItem(fieldTexture);
-    QBrush backgroundBrush(QImage(":/textures/resources/backgroundTexture.jpg"));
+    QBrush backgroundBrush(QImage(":/textures/resources/backgroundTexture.png"));
 
     gameFieldView = new myGameFieldView(fieldTexture.width(), fieldTexture.height());
     gameFieldView->setBackgroundBrush(backgroundBrush);
@@ -24,14 +25,63 @@ CornersGame::CornersGame(QWidget *parent) :
     gameFieldView->setScene(scene);
     scene->addItem(fieldTextureItem);
 
-    QObject::connect(ui->newGameButton, SIGNAL(clicked(bool)), this, SLOT(test()));
+    //Because on a start game doesn't running
+    gameRunning = false;
+
+    //Setup number of checkers and resizing vectors
+    numberOfCheckers = 9;
+    whiteCheckers.resize(numberOfCheckers);
+    blackCheckers.resize(numberOfCheckers);
+
+    for (int i = 0; i < numberOfCheckers; ++i)
+    {
+        whiteCheckers[i] = blackCheckers[i] = NULL;
+    }
+
+    QObject::connect(ui->newGameButton, SIGNAL(clicked(bool)), this, SLOT(newGameClicked()));
     QObject::connect(gameFieldView, SIGNAL(resized(QResizeEvent *)), this, SLOT(resizeView(QResizeEvent *)));
     QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
 }
 
-void CornersGame::test()
+void CornersGame::newGameClicked()
 {
-    qDebug() << "Scene height: " << scene->height() << " Scene width: " << scene->width();
+    if (!gameRunning)
+    {
+        //Getting and resizing textures
+        QPixmap whiteCheckerTexture(":/textures/resources/whiteChess.png");
+        QPixmap blackCheckerTexture(":/textures/resources/blackChess.png");
+        whiteCheckerTexture = whiteCheckerTexture.scaled(73, 73, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        blackCheckerTexture = blackCheckerTexture.scaled(73, 73, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+        //Creating white checkers
+        for (int i = 0; i < this->numberOfCheckers; ++i)
+        {
+            Checker *checker = new Checker(whiteCheckerTexture);
+            if (whiteCheckers[i] != NULL) whiteCheckers[i] = checker;
+            scene->addItem(checker);
+            checker->setPos((i % 3) * gameFieldView->cellSize, scene->height() - (i / 3 + 1) * gameFieldView->cellSize - 1);
+        }
+
+        //Creating black checkers
+        for (int i = 0; i < this->numberOfCheckers; ++i)
+        {
+            Checker *checker = new Checker(blackCheckerTexture);
+            if (blackCheckers[i] != NULL) blackCheckers[i] = checker;
+            scene->addItem(checker);
+            checker->setPos(scene->width() - (i % 3 + 1) * gameFieldView->cellSize - 1, (i / 3) * gameFieldView->cellSize);
+        }
+
+        gameRunning = true;
+    }
+    else
+    {
+        //NewGameDialog
+        for (int i = 0; i < this->numberOfCheckers; ++i)
+        {
+            whiteCheckers[i]->setPos((i % 3) * gameFieldView->cellSize, scene->height() - (i / 3 + 1) * gameFieldView->cellSize - 1);
+            blackCheckers[i]->setPos(scene->width() - (i % 3 + 1) * gameFieldView->cellSize - 1, (i / 3) * gameFieldView->cellSize);
+        }
+    }
 }
 
 //WTF How it works

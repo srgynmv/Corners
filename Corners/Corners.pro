@@ -14,12 +14,17 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         cornersgame.cpp \
-    mygamefieldview.cpp
+    mygamefieldview.cpp \
+    checker.cpp \
+    newgamedialog.cpp
 
 HEADERS  += cornersgame.h \
-    mygamefieldview.h
+    mygamefieldview.h \
+    checker.h \
+    newgamedialog.h
 
-FORMS    += cornersgame.ui
+FORMS    += cornersgame.ui \
+    newgamedialog.ui
 
 DISTFILES +=
 

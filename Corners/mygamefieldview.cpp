@@ -9,7 +9,9 @@ myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView()
     this->setMinimumHeight(height);
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->cellSize = 72.5;
     fieldSize = height;
+    this->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 }
 
 int myGameFieldView::heightForWidth(int width) const

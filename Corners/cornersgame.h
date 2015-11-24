@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QtWidgets>
 #include <mygamefieldview.h>
+#include <checker.h>
+#include <newgamedialog.h>
 
 namespace Ui {
 class CornersGame;
@@ -18,7 +20,7 @@ public:
     ~CornersGame();
 
 public slots:
-    void test();
+    void newGameClicked();
     void resizeView(QResizeEvent *event);
 
 private:
@@ -26,6 +28,9 @@ private:
     myGameFieldView *gameFieldView;
     QGraphicsScene *scene;
     QGraphicsScene *fieldScene;
+    QVector <Checker *> whiteCheckers, blackCheckers;
+    bool gameRunning;
+    int numberOfCheckers;
 };
 
 #endif // CORNERSGAME_H
