@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QtWidgets>
+#include <mygamefieldview.h>
 
 namespace Ui {
 class CornersGame;
@@ -18,9 +19,12 @@ public:
 
 public slots:
     void test();
+    void resizeView(QResizeEvent *event);
 
 private:
     Ui::CornersGame *ui;
+    myGameFieldView *gameFieldView;
+    QGraphicsScene *scene;
     QGraphicsScene *fieldScene;
 };
 

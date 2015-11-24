@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/textures">
         <file>resources/fieldTexture.jpg</file>
+        <file>resources/backgroundTexture.jpg</file>
     </qresource>
 </RCC>

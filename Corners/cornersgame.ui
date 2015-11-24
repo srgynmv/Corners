@@ -41,6 +41,9 @@
     </property>
     <item>
      <layout class="QVBoxLayout" name="verticalGameLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <property name="topMargin">
        <number>0</number>
       </property>

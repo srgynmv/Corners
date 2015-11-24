@@ -2,11 +2,14 @@
 
 myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView()
 {
-    QSizePolicy policy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QSizePolicy policy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     policy.setHeightForWidth(true);
     this->setSizePolicy(policy);
-    this->setMinimumWidth(width);
+    this->setMinimumWidth(width + 2);
     this->setMinimumHeight(height);
+    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    fieldSize = height;
 }
 
 int myGameFieldView::heightForWidth(int width) const
@@ -16,14 +19,6 @@ int myGameFieldView::heightForWidth(int width) const
 
 void myGameFieldView::resizeEvent(QResizeEvent *event)
 {
-    int minSize = qMin(event->size().height(), event->size().width());
-    qDebug() << "x: " << this->x() << " y: " << this->y();
-    int newY = this->parentWidget()->height() / 2 - minSize / 2;
-    int newX = this->parentWidget()->width() > 1000 ? ((this->parentWidget()->width() - 1000 + 9) - (this->parentWidget()->height() - 600) / 2 - (this->parentWidget()->width() - 1000 + 9) / 3) : this->x();
-
-    newX = newX < 9 ? 9 : newX;
-
-    qDebug() << "NewX: " << newX << " NewY: " << newY;
-    this->setGeometry(newX, newY, minSize, minSize);
     QGraphicsView::resizeEvent(event);
+    emit resized(event);
 }
