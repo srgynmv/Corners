@@ -40,7 +40,7 @@ CornersGame::CornersGame(QWidget *parent) :
 
     QObject::connect(ui->newGameButton, SIGNAL(clicked(bool)), this, SLOT(newGameClicked()));
     QObject::connect(gameFieldView, SIGNAL(resized(QResizeEvent *)), this, SLOT(resizeView(QResizeEvent *)));
-    QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
+    QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(askingClose()));
 }
 
 void CornersGame::newGameClicked()
@@ -57,7 +57,7 @@ void CornersGame::newGameClicked()
         for (int i = 0; i < this->numberOfCheckers; ++i)
         {
             Checker *checker = new Checker(whiteCheckerTexture);
-            if (whiteCheckers[i] != NULL) whiteCheckers[i] = checker;
+            if (whiteCheckers[i] == NULL) whiteCheckers[i] = checker;
             scene->addItem(checker);
             checker->setPos((i % 3) * gameFieldView->cellSize, scene->height() - (i / 3 + 1) * gameFieldView->cellSize - 1);
         }
@@ -66,7 +66,7 @@ void CornersGame::newGameClicked()
         for (int i = 0; i < this->numberOfCheckers; ++i)
         {
             Checker *checker = new Checker(blackCheckerTexture);
-            if (blackCheckers[i] != NULL) blackCheckers[i] = checker;
+            if (blackCheckers[i] == NULL) blackCheckers[i] = checker;
             scene->addItem(checker);
             checker->setPos(scene->width() - (i % 3 + 1) * gameFieldView->cellSize - 1, (i / 3) * gameFieldView->cellSize);
         }
@@ -75,11 +75,11 @@ void CornersGame::newGameClicked()
     }
     else
     {
-        NewGameDialog newGameDialog;
-
+        //Out asking dialog about new game
         if (newGameDialog.exec())
         {
-            qDebug() << "cout";
+            //TODO...:
+            //Update scene, matrix, etc.
             for (int i = 0; i < this->numberOfCheckers; ++i)
             {
                 whiteCheckers[i]->setPos((i % 3) * gameFieldView->cellSize, scene->height() - (i / 3 + 1) * gameFieldView->cellSize - 1);
@@ -93,12 +93,17 @@ void CornersGame::newGameClicked()
 void CornersGame::resizeView(QResizeEvent *event)
 {
     double newFieldSize = qMin(event->size().width(), event->size().height());
-
     //Scales the all view to the new size:
-    gameFieldView->scale(newFieldSize / gameFieldView->fieldSize, 1);
-    gameFieldView->scale(1, newFieldSize / gameFieldView->fieldSize);
-
+    gameFieldView->scale(newFieldSize / gameFieldView->fieldSize, newFieldSize / gameFieldView->fieldSize);
     gameFieldView->fieldSize = newFieldSize;
+}
+
+void CornersGame::askingClose()
+{
+    if (this->exitDialog.exec())
+    {
+        this->close();
+    }
 }
 
 CornersGame::~CornersGame()

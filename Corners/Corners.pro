@@ -16,15 +16,18 @@ SOURCES += main.cpp\
         cornersgame.cpp \
     mygamefieldview.cpp \
     checker.cpp \
-    newgamedialog.cpp
+    newgamedialog.cpp \
+    exitdialog.cpp
 
 HEADERS  += cornersgame.h \
     mygamefieldview.h \
     checker.h \
-    newgamedialog.h
+    newgamedialog.h \
+    exitdialog.h
 
 FORMS    += cornersgame.ui \
-    newgamedialog.ui
+    newgamedialog.ui \
+    exitdialog.ui
 
 DISTFILES +=
 
