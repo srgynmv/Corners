@@ -15,6 +15,9 @@ public:
     explicit SettingsDialog(QWidget *parent = 0);
     ~SettingsDialog();
 
+public slots:
+    void changeDifficulty();
+
 private:
     Ui::SettingsDialog *ui;
 };

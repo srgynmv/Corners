@@ -6,26 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>135</width>
-    <height>154</height>
+    <width>143</width>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>20</number>
-   </property>
-   <property name="topMargin">
-    <number>20</number>
-   </property>
-   <property name="rightMargin">
-    <number>20</number>
-   </property>
-   <property name="bottomMargin">
-    <number>20</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QLabel" name="label">
      <property name="font">
@@ -49,34 +37,125 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Playing wih:</string>
+    <layout class="QVBoxLayout" name="enemyLayout">
+     <property name="leftMargin">
+      <number>0</number>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     <property name="topMargin">
+      <number>0</number>
      </property>
-    </widget>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QWidget" name="enemyWidget" native="true">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="playingLabel">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Playing with:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="computerRadioButton">
+          <property name="text">
+           <string>Computer</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="playerRadioButton">
+          <property name="text">
+           <string>Player</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QRadioButton" name="playerRadioButton">
-     <property name="text">
-      <string>Player</string>
+    <layout class="QVBoxLayout" name="difficultyLayout">
+     <property name="leftMargin">
+      <number>0</number>
      </property>
-     <property name="checked">
-      <bool>true</bool>
+     <property name="topMargin">
+      <number>0</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QRadioButton" name="computerRadioButton">
-     <property name="text">
-      <string>Computer</string>
+     <property name="rightMargin">
+      <number>0</number>
      </property>
-     <property name="checked">
-      <bool>false</bool>
+     <property name="bottomMargin">
+      <number>0</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QWidget" name="difficultyWidget" native="true">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="difficultyLabel">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Difficulty Level:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="easyRadioButton">
+          <property name="text">
+           <string>Easy</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="mediumRadioButton">
+          <property name="text">
+           <string>Medium</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="hardRadioButton">
+          <property name="text">
+           <string>Hard</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
