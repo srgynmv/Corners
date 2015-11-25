@@ -24,3 +24,5 @@ void myGameFieldView::resizeEvent(QResizeEvent *event)
     QGraphicsView::resizeEvent(event);
     emit resized(event);
 }
+
+

@@ -101,6 +101,13 @@
        </widget>
       </item>
       <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="verticalSpacer_3">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -160,7 +167,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="moveLabel">
+       <widget class="QLabel" name="infoLabel">
         <property name="text">
          <string>Player1 move</string>
         </property>

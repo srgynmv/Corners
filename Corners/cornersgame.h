@@ -8,6 +8,7 @@
 #include <newgamedialog.h>
 #include <exitdialog.h>
 #include <QtDebug>
+#include <settingsdialog.h>
 
 namespace Ui {
 class CornersGame;
@@ -20,11 +21,12 @@ class CornersGame : public QMainWindow
 public:
     explicit CornersGame(QWidget *parent = 0);
     ~CornersGame();
+    virtual void closeEvent(QCloseEvent *event);
 
 public slots:
     void newGameClicked();
     void resizeView(QResizeEvent *event);
-    void askingClose();
+
 private:
     Ui::CornersGame *ui;
     myGameFieldView *gameFieldView;
@@ -33,8 +35,8 @@ private:
     QVector <Checker *> whiteCheckers, blackCheckers;
     bool gameRunning;
     int numberOfCheckers;
-    NewGameDialog newGameDialog;
-    ExitDialog exitDialog;
+    NewGameDialog *newGameDialog;
+    SettingsDialog *settingsDialog;
 };
 
 #endif // CORNERSGAME_H

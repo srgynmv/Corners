@@ -38,9 +38,13 @@ CornersGame::CornersGame(QWidget *parent) :
         whiteCheckers[i] = blackCheckers[i] = NULL;
     }
 
+    newGameDialog = new NewGameDialog;
+    settingsDialog = new SettingsDialog;
+
     QObject::connect(ui->newGameButton, SIGNAL(clicked(bool)), this, SLOT(newGameClicked()));
     QObject::connect(gameFieldView, SIGNAL(resized(QResizeEvent *)), this, SLOT(resizeView(QResizeEvent *)));
-    QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(askingClose()));
+    QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
+    QObject::connect(ui->settingsButton, SIGNAL(clicked(bool)), this->settingsDialog, SLOT(exec()));
 }
 
 void CornersGame::newGameClicked()
@@ -50,8 +54,12 @@ void CornersGame::newGameClicked()
         //Getting and resizing textures
         QPixmap whiteCheckerTexture(":/textures/resources/whiteChess.png");
         QPixmap blackCheckerTexture(":/textures/resources/blackChess.png");
-        whiteCheckerTexture = whiteCheckerTexture.scaled(73, 73, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        blackCheckerTexture = blackCheckerTexture.scaled(73, 73, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+        //Converting from double to int
+        int cellSize = gameFieldView->cellSize + 0.5;
+
+        whiteCheckerTexture = whiteCheckerTexture.scaled(cellSize, cellSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        blackCheckerTexture = blackCheckerTexture.scaled(cellSize, cellSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
         //Creating white checkers
         for (int i = 0; i < this->numberOfCheckers; ++i)
@@ -76,7 +84,7 @@ void CornersGame::newGameClicked()
     else
     {
         //Out asking dialog about new game
-        if (newGameDialog.exec())
+        if (newGameDialog->exec())
         {
             //TODO...:
             //Update scene, matrix, etc.
@@ -98,11 +106,17 @@ void CornersGame::resizeView(QResizeEvent *event)
     gameFieldView->fieldSize = newFieldSize;
 }
 
-void CornersGame::askingClose()
+//Reimplementing closeEvent() for message box
+void CornersGame::closeEvent(QCloseEvent *event)
 {
-    if (this->exitDialog.exec())
+    ExitDialog exitDialog;
+    if (exitDialog.exec())
     {
-        this->close();
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
     }
 }
 

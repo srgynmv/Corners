@@ -8,6 +8,7 @@ NewGameDialog::NewGameDialog(QWidget *parent) :
     ui->setupUi(this);
     this->setFixedSize(this->width(), this->height());
     this->setWindowTitle(" ");
+    this->setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
 }
 
 NewGameDialog::~NewGameDialog()

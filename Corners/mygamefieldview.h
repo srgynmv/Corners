@@ -1,6 +1,8 @@
 #ifndef MYGAMEFIELDVIEW_H
 #define MYGAMEFIELDVIEW_H
 #include <QtWidgets>
+#include <exitdialog.h>
+#include <QtDebug>
 
 class myGameFieldView  : public QGraphicsView
 {

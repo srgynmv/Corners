@@ -1,17 +1,17 @@
-#include "exitdialog.h"
-#include "ui_exitdialog.h"
+#include "settingsdialog.h"
+#include "ui_settingsdialog.h"
 
-ExitDialog::ExitDialog(QWidget *parent) :
+SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ExitDialog)
+    ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
     this->setFixedSize(this->width(), this->height());
-    this->setWindowTitle("Exit");
+    this->setWindowTitle("Settings");
     this->setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
 }
 
-ExitDialog::~ExitDialog()
+SettingsDialog::~SettingsDialog()
 {
     delete ui;
 }
