@@ -9,7 +9,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     this->setFixedSize(this->width(), this->height());
     this->setWindowTitle("Settings");
     this->setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
-
+    this->playingWithComputer = ui->computerRadioButton->isChecked();
     QObject::connect(ui->playerRadioButton, SIGNAL(clicked(bool)), this, SLOT(changeDifficulty()));
     QObject::connect(ui->computerRadioButton, SIGNAL(clicked(bool)), this, SLOT(changeDifficulty()));
 }
@@ -19,10 +19,12 @@ void SettingsDialog::changeDifficulty()
     if (ui->playerRadioButton->isChecked())
     {
         ui->difficultyWidget->setEnabled(false);
+        this->playingWithComputer = false;
     }
     else
     {
         ui->difficultyWidget->setEnabled(true);
+        this->playingWithComputer = true;
     }
 }
 

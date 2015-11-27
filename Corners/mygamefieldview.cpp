@@ -9,8 +9,8 @@ myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView()
     this->setMinimumHeight(height);
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    this->cellSize = 72.5;
     fieldSize = height;
+    this->cellSize = fieldSize / 8;
     this->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 }
 
@@ -23,6 +23,25 @@ void myGameFieldView::resizeEvent(QResizeEvent *event)
 {
     QGraphicsView::resizeEvent(event);
     emit resized(event);
+}
+
+void myGameFieldView::mousePressEvent(QMouseEvent *event)
+{
+    QGraphicsView::mousePressEvent(event);
+    qDebug() << "clicked on: ";
+    if (this->itemAt(event->x(), event->y())->type() == Checker::White)
+    {
+        qDebug() << "white checker";
+        //this->itemAt(event->x(), event->y())->setSelected(true);
+    }
+    else if (this->itemAt(event->x(), event->y())->type() == Checker::Black)
+    {
+        qDebug() << "black checker";
+    }
+    else
+    {
+        qDebug() << "field";
+    }
 }
 
 

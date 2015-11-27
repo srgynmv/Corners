@@ -11,9 +11,11 @@ class SettingsDialog : public QDialog
 {
     Q_OBJECT
 
+    friend class CornersGame;
 public:
     explicit SettingsDialog(QWidget *parent = 0);
     ~SettingsDialog();
+    bool playingWithComputer;
 
 public slots:
     void changeDifficulty();

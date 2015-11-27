@@ -2,6 +2,7 @@
 #define MYGAMEFIELDVIEW_H
 #include <QtWidgets>
 #include <exitdialog.h>
+#include <checker.h>
 #include <QtDebug>
 
 class myGameFieldView  : public QGraphicsView
@@ -16,6 +17,7 @@ public:
     myGameFieldView(int width, int height);
     virtual int heightForWidth(int width) const;
     virtual void resizeEvent(QResizeEvent *event);
+    void mousePressEvent(QMouseEvent *event);
     double fieldSize;
     double cellSize;
 };

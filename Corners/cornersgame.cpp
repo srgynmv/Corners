@@ -22,6 +22,10 @@ CornersGame::CornersGame(QWidget *parent) :
 
     //Add scene to view
     scene = new QGraphicsScene();
+
+//    QPainterPath selection = scene->selectionArea();
+//    selection.fillRect;
+
     gameFieldView->setScene(scene);
     scene->addItem(fieldTextureItem);
 
@@ -64,19 +68,19 @@ void CornersGame::newGameClicked()
         //Creating white checkers
         for (int i = 0; i < this->numberOfCheckers; ++i)
         {
-            Checker *checker = new Checker(whiteCheckerTexture);
+            WhiteChecker *checker = new WhiteChecker(whiteCheckerTexture);
             if (whiteCheckers[i] == NULL) whiteCheckers[i] = checker;
             scene->addItem(checker);
-            checker->setPos((i % 3) * gameFieldView->cellSize, scene->height() - (i / 3 + 1) * gameFieldView->cellSize - 1);
+            checker->setPos((i % 3) *  gameFieldView->cellSize , scene->height() - (i / 3 + 1) *  gameFieldView->cellSize - 2);
         }
 
         //Creating black checkers
         for (int i = 0; i < this->numberOfCheckers; ++i)
         {
-            Checker *checker = new Checker(blackCheckerTexture);
+            BlackChecker *checker = new BlackChecker(blackCheckerTexture);
             if (blackCheckers[i] == NULL) blackCheckers[i] = checker;
             scene->addItem(checker);
-            checker->setPos(scene->width() - (i % 3 + 1) * gameFieldView->cellSize - 1, (i / 3) * gameFieldView->cellSize);
+            checker->setPos(scene->width() - (i % 3 + 1) *  gameFieldView->cellSize - 2, (i / 3) *  gameFieldView->cellSize );
         }
 
         gameRunning = true;
@@ -90,8 +94,8 @@ void CornersGame::newGameClicked()
             //Update scene, matrix, etc.
             for (int i = 0; i < this->numberOfCheckers; ++i)
             {
-                whiteCheckers[i]->setPos((i % 3) * gameFieldView->cellSize, scene->height() - (i / 3 + 1) * gameFieldView->cellSize - 1);
-                blackCheckers[i]->setPos(scene->width() - (i % 3 + 1) * gameFieldView->cellSize - 1, (i / 3) * gameFieldView->cellSize);
+                whiteCheckers[i]->setPos((i % 3) *  gameFieldView->cellSize , scene->height() - (i / 3 + 1) *  gameFieldView->cellSize - 2);
+                blackCheckers[i]->setPos(scene->width() - (i % 3 + 1) *  gameFieldView->cellSize - 2, (i / 3) *  gameFieldView->cellSize );
             }
         }
     }
