@@ -27,6 +27,11 @@ public:
 public slots:
     void newGameClicked();
     void resizeView(QResizeEvent *event);
+        void game();
+
+signals:
+    void newGameStarted();
+    void finishGame();
 
 private:
     Ui::CornersGame *ui;
@@ -36,11 +41,14 @@ private:
     QVector <Checker *> whiteCheckers, blackCheckers;
     bool gameRunning;
     int numberOfCheckers;
+
     NewGameDialog *newGameDialog;
     SettingsDialog *settingsDialog;
     RulesDialog *rulesDialog;
+    ExitDialog *exitDialog;
+
+    QEventLoop *newGameLoop;
     QEventLoop *loop;
-    void game();
     void getMove(bool white);
     bool checkHomes();
 };

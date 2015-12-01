@@ -1,6 +1,6 @@
 #include "mygamefieldview.h"
 
-myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView()
+myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView(), TRANSPARENSY(50)
 {
     QSizePolicy policy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     policy.setHeightForWidth(true);
@@ -12,6 +12,8 @@ myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView()
     fieldSize = height;
     this->cellSize = fieldSize / 8;
     this->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+
+    checkerSelected = false;
 }
 
 int myGameFieldView::heightForWidth(int width) const
@@ -27,50 +29,89 @@ void myGameFieldView::resizeEvent(QResizeEvent *event)
 
 void myGameFieldView::erasePossibleMoves()
 {
-
+    for (int i = 0; i < selectionItems.size(); ++i)
+    {
+        delete selectionItems[i];
+    }
+    selectionItems.resize(0);
+    selectionItems.squeeze();
 }
 
-void myGameFieldView::printPossibleMoves(QMouseEvent *event)
+QVector<QGraphicsRectItem *> myGameFieldView::printPossibleMoves(QMouseEvent *event, bool white)
 {
+    QPoint clickPoint(event->x(), event->y());
+    QPointF clickPointF;
+    clickPointF = this->mapToScene(clickPoint);
 
+    int checker_i = clickPointF.y() / cellSize;
+    int checker_j = clickPointF.x() / cellSize;
+
+    QColor green = QColor(0, 255, 0, TRANSPARENSY);
+
+    QVector<QGraphicsRectItem *> result;
+
+    if (white)
+    {
+        QGraphicsRectItem *right = this->scene()->addRect((checker_j + 1) * cellSize, checker_i * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+        QGraphicsRectItem *up = this->scene()->addRect((checker_j) * cellSize, (checker_i - 1) * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+
+        result.push_back(up);
+        result.push_back(right);
+        this->scene()->addItem(up);
+        this->scene()->addItem(right);
+    }
+    else
+    {
+        QGraphicsRectItem *left = this->scene()->addRect((checker_j - 1) * cellSize, checker_i * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+        QGraphicsRectItem *down = this->scene()->addRect((checker_j) * cellSize, (checker_i + 1) * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+
+        result.push_back(down);
+        result.push_back(left);
+        this->scene()->addItem(down);
+        this->scene()->addItem(left);
+    }
+
+    return result;
 }
 
 void myGameFieldView::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsView::mousePressEvent(event);
-
-//        qDebug() << "clicked on: ";
-//        if (this->itemAt(event->x(), event->y())->type() == Checker::White)
-//        {
-//            qDebug() << "white checker";
-//        }
-//        else if (this->itemAt(event->x(), event->y())->type() == Checker::Black)
-//        {
-//            qDebug() << "black checker";
-//        }
-//        else
-//        {
-//            qDebug() << "field";
-//        }
-
-    if (selection)
+    if (checkerSelected && this->itemAt(event->x(), event->y())->type() == QGraphicsRectItem::Type)
     {
         //Checking clicked cell
-        //emit signal
+        //emit "moving" signal
+        checkerSelected = false;
+        erasePossibleMoves();
 
-        //return;
+        QPoint clickPoint(event->x(), event->y());
+        QPointF clickPointF;
+        clickPointF = this->mapToScene(clickPoint);
+
+        int checkerI = clickPointF.y() / cellSize;
+        int checkerJ = clickPointF.x() / cellSize;
+
+        this->itemAt(selectedCheckerX, selectedCheckerY)->setPos(checkerJ * cellSize, checkerI * cellSize);
+        emit checkerMoved();
+        return;
     }
 
     //Deleting all possible moves from field
-    selection = false;
+    checkerSelected = false;
     erasePossibleMoves();
 
     if (this->itemAt(event->x(), event->y())->isSelected() &&
             (this->itemAt(event->x(), event->y())->type() == Checker::White || this->itemAt(event->x(), event->y())->type() == Checker::Black))
     {
-        selection = true;
+        checkerSelected = true;
+
+        selectedCheckerX = event->x();
+        selectedCheckerY = event->y();
+
         //Printing new possible moves
-        printPossibleMoves(event);
+        bool white = this->itemAt(event->x(), event->y())->type() == Checker::White ? true : false;
+        qDebug() << white;
+        selectionItems = printPossibleMoves(event, white);
     }
 }
 

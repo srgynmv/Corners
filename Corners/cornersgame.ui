@@ -168,6 +168,11 @@
       </item>
       <item>
        <widget class="QLabel" name="infoLabel">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Player1 move</string>
         </property>

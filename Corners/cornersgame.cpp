@@ -42,6 +42,8 @@ CornersGame::CornersGame(QWidget *parent) :
     newGameDialog = new NewGameDialog;
     settingsDialog = new SettingsDialog;
     rulesDialog = new RulesDialog;
+    exitDialog = new ExitDialog;
+    newGameLoop = new QEventLoop;
     loop = new QEventLoop;
 
     QObject::connect(ui->newGameButton, SIGNAL(clicked(bool)), this, SLOT(newGameClicked()));
@@ -50,6 +52,8 @@ CornersGame::CornersGame(QWidget *parent) :
     QObject::connect(ui->settingsButton, SIGNAL(clicked(bool)), this->settingsDialog, SLOT(exec()));
     QObject::connect(ui->rulesButton, SIGNAL(clicked(bool)), this->rulesDialog, SLOT(exec()));
     QObject::connect(gameFieldView, SIGNAL(checkerMoved()), loop, SLOT(quit()));
+    QObject::connect(this, SIGNAL(newGameStarted()), this, SLOT(game()));
+    QObject::connect(this, SIGNAL(finishGame()), loop, SLOT(quit()));
 }
 
 void CornersGame::newGameClicked()
@@ -84,22 +88,32 @@ void CornersGame::newGameClicked()
             checker->setPos(scene->width() - (i % 3 + 1) *  gameFieldView->cellSize - 2, (i / 3) *  gameFieldView->cellSize );
         }
 
-        gameRunning = true;
-        game();
+        emit newGameStarted();
     }
     else
     {
         //Out asking dialog about new game
         if (newGameDialog->exec())
         {
+            qDebug() << "Call exit()";
+            //Emit signal for finishing game
+            gameRunning = false;
+            emit finishGame();
+            qDebug() << "Emit finishing()";
             //TODO...:
             //Update scene, matrix, etc.
+
             for (int i = 0; i < this->numberOfCheckers; ++i)
             {
                 whiteCheckers[i]->setPos((i % 3) *  gameFieldView->cellSize , scene->height() - (i / 3 + 1) *  gameFieldView->cellSize - 2);
                 blackCheckers[i]->setPos(scene->width() - (i % 3 + 1) *  gameFieldView->cellSize - 2, (i / 3) *  gameFieldView->cellSize );
             }
-            game();
+
+            //Waiting for last game finish
+            qDebug() << "Waiting for finish...";
+            newGameLoop->exec();
+            qDebug() << "prev game closed";
+            emit newGameStarted();
         }
     }
 }
@@ -112,17 +126,27 @@ void CornersGame::getMove(bool white)
         blackCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, !white);
         whiteCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, white);
     }
+    qDebug() << "In getMove()";
     loop->exec();
+    qDebug() << "Loop quit";
 }
 
 bool CornersGame::checkHomes()
 {
     //TODO...
+    qDebug() << "In checkHomes()";
+    if (exitDialog->result() == QDialog::Accepted || !gameRunning)
+    {
+        return false;
+    }
+    qDebug() << gameRunning;
     return true;
 }
 
 void CornersGame::game()
 {
+    gameRunning = true;
+    qDebug() << "Started new game() func";
     bool whiteTurn = rand() % 2;
     QString info = whiteTurn ? "Turn of white" : "Turn of black";
 
@@ -136,6 +160,8 @@ void CornersGame::game()
         info = whiteTurn? "Turn of white" : "Turn of black";
         gameRunning = checkHomes();
     }
+
+    newGameLoop->quit();
 }
 
 //WTF How it works
@@ -150,9 +176,10 @@ void CornersGame::resizeView(QResizeEvent *event)
 //Reimplementing closeEvent() for message box
 void CornersGame::closeEvent(QCloseEvent *event)
 {
-    ExitDialog exitDialog;
-    if (exitDialog.exec())
+    if (exitDialog->exec())
     {
+        //Closing game loop event
+        loop->quit();
         event->accept();
     }
     else
@@ -163,5 +190,6 @@ void CornersGame::closeEvent(QCloseEvent *event)
 
 CornersGame::~CornersGame()
 {
+    qDebug() << "Destructor called";
     delete ui;
 }

@@ -22,9 +22,15 @@ public:
     void mousePressEvent(QMouseEvent *event);
     double fieldSize;
     double cellSize;
-    bool selection;
-    void printPossibleMoves(QMouseEvent *event);
+    bool checkerSelected;
+    QVector<QGraphicsRectItem *> printPossibleMoves(QMouseEvent *event, bool white);
     void erasePossibleMoves();
+
+private:
+    const int TRANSPARENSY;
+    QVector<QGraphicsRectItem *> selectionItems;
+    double selectedCheckerX;
+    double selectedCheckerY;
 
 };
 
