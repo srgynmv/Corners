@@ -5,4 +5,7 @@
         <file>resources/whiteChess.png</file>
         <file>resources/blackChess.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>rules.html</file>
+    </qresource>
 </RCC>

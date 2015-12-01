@@ -22,10 +22,6 @@ CornersGame::CornersGame(QWidget *parent) :
 
     //Add scene to view
     scene = new QGraphicsScene();
-
-//    QPainterPath selection = scene->selectionArea();
-//    selection.fillRect;
-
     gameFieldView->setScene(scene);
     scene->addItem(fieldTextureItem);
 
@@ -41,14 +37,17 @@ CornersGame::CornersGame(QWidget *parent) :
     {
         whiteCheckers[i] = blackCheckers[i] = NULL;
     }
+    ui->infoLabel->setText("");
 
     newGameDialog = new NewGameDialog;
     settingsDialog = new SettingsDialog;
+    rulesDialog = new RulesDialog;
 
     QObject::connect(ui->newGameButton, SIGNAL(clicked(bool)), this, SLOT(newGameClicked()));
     QObject::connect(gameFieldView, SIGNAL(resized(QResizeEvent *)), this, SLOT(resizeView(QResizeEvent *)));
     QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
     QObject::connect(ui->settingsButton, SIGNAL(clicked(bool)), this->settingsDialog, SLOT(exec()));
+    QObject::connect(ui->rulesButton, SIGNAL(clicked(bool)), this->rulesDialog, SLOT(exec()));
 }
 
 void CornersGame::newGameClicked()
@@ -84,6 +83,7 @@ void CornersGame::newGameClicked()
         }
 
         gameRunning = true;
+        game();
     }
     else
     {
@@ -97,8 +97,14 @@ void CornersGame::newGameClicked()
                 whiteCheckers[i]->setPos((i % 3) *  gameFieldView->cellSize , scene->height() - (i / 3 + 1) *  gameFieldView->cellSize - 2);
                 blackCheckers[i]->setPos(scene->width() - (i % 3 + 1) *  gameFieldView->cellSize - 2, (i / 3) *  gameFieldView->cellSize );
             }
+            game();
         }
     }
+}
+
+void CornersGame::game()
+{
+    ui->infoLabel->setText("Game started!");
 }
 
 //WTF How it works

@@ -74,7 +74,7 @@
            <string>Computer</string>
           </property>
           <property name="checked">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -84,7 +84,7 @@
            <string>Player</string>
           </property>
           <property name="checked">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -110,7 +110,7 @@
      <item>
       <widget class="QWidget" name="difficultyWidget" native="true">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>

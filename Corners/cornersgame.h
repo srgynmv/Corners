@@ -9,6 +9,7 @@
 #include <exitdialog.h>
 #include <QtDebug>
 #include <settingsdialog.h>
+#include <rulesdialog.h>
 
 namespace Ui {
 class CornersGame;
@@ -37,6 +38,8 @@ private:
     int numberOfCheckers;
     NewGameDialog *newGameDialog;
     SettingsDialog *settingsDialog;
+    RulesDialog *rulesDialog;
+    void game();
 };
 
 #endif // CORNERSGAME_H
