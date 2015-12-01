@@ -39,7 +39,10 @@ private:
     NewGameDialog *newGameDialog;
     SettingsDialog *settingsDialog;
     RulesDialog *rulesDialog;
+    QEventLoop *loop;
     void game();
+    void getMove(bool white);
+    bool checkHomes();
 };
 
 #endif // CORNERSGAME_H

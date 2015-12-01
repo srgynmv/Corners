@@ -25,22 +25,52 @@ void myGameFieldView::resizeEvent(QResizeEvent *event)
     emit resized(event);
 }
 
+void myGameFieldView::erasePossibleMoves()
+{
+
+}
+
+void myGameFieldView::printPossibleMoves(QMouseEvent *event)
+{
+
+}
+
 void myGameFieldView::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsView::mousePressEvent(event);
-    qDebug() << "clicked on: ";
-    if (this->itemAt(event->x(), event->y())->type() == Checker::White)
+
+//        qDebug() << "clicked on: ";
+//        if (this->itemAt(event->x(), event->y())->type() == Checker::White)
+//        {
+//            qDebug() << "white checker";
+//        }
+//        else if (this->itemAt(event->x(), event->y())->type() == Checker::Black)
+//        {
+//            qDebug() << "black checker";
+//        }
+//        else
+//        {
+//            qDebug() << "field";
+//        }
+
+    if (selection)
     {
-        qDebug() << "white checker";
-        //this->itemAt(event->x(), event->y())->setSelected(true);
+        //Checking clicked cell
+        //emit signal
+
+        //return;
     }
-    else if (this->itemAt(event->x(), event->y())->type() == Checker::Black)
+
+    //Deleting all possible moves from field
+    selection = false;
+    erasePossibleMoves();
+
+    if (this->itemAt(event->x(), event->y())->isSelected() &&
+            (this->itemAt(event->x(), event->y())->type() == Checker::White || this->itemAt(event->x(), event->y())->type() == Checker::Black))
     {
-        qDebug() << "black checker";
-    }
-    else
-    {
-        qDebug() << "field";
+        selection = true;
+        //Printing new possible moves
+        printPossibleMoves(event);
     }
 }
 

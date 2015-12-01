@@ -13,6 +13,8 @@ class myGameFieldView  : public QGraphicsView
 
 signals:
     void resized(QResizeEvent *event);
+    void checkerMoved();
+
 public:
     myGameFieldView(int width, int height);
     virtual int heightForWidth(int width) const;
@@ -20,6 +22,10 @@ public:
     void mousePressEvent(QMouseEvent *event);
     double fieldSize;
     double cellSize;
+    bool selection;
+    void printPossibleMoves(QMouseEvent *event);
+    void erasePossibleMoves();
+
 };
 
 #endif // MYGAMEFIELDVIEW_H

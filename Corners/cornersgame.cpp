@@ -42,12 +42,14 @@ CornersGame::CornersGame(QWidget *parent) :
     newGameDialog = new NewGameDialog;
     settingsDialog = new SettingsDialog;
     rulesDialog = new RulesDialog;
+    loop = new QEventLoop;
 
     QObject::connect(ui->newGameButton, SIGNAL(clicked(bool)), this, SLOT(newGameClicked()));
     QObject::connect(gameFieldView, SIGNAL(resized(QResizeEvent *)), this, SLOT(resizeView(QResizeEvent *)));
     QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
     QObject::connect(ui->settingsButton, SIGNAL(clicked(bool)), this->settingsDialog, SLOT(exec()));
     QObject::connect(ui->rulesButton, SIGNAL(clicked(bool)), this->rulesDialog, SLOT(exec()));
+    QObject::connect(gameFieldView, SIGNAL(checkerMoved()), loop, SLOT(quit()));
 }
 
 void CornersGame::newGameClicked()
@@ -102,9 +104,38 @@ void CornersGame::newGameClicked()
     }
 }
 
+void CornersGame::getMove(bool white)
+{
+    for (int i = 0; i < this->numberOfCheckers; ++i)
+    {
+        //Setup selection
+        blackCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, !white);
+        whiteCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, white);
+    }
+    loop->exec();
+}
+
+bool CornersGame::checkHomes()
+{
+    //TODO...
+    return true;
+}
+
 void CornersGame::game()
 {
-    ui->infoLabel->setText("Game started!");
+    bool whiteTurn = rand() % 2;
+    QString info = whiteTurn ? "Turn of white" : "Turn of black";
+
+    while (gameRunning)
+    {
+        ui->infoLabel->setText(info);
+
+        getMove(whiteTurn);
+
+        whiteTurn = !whiteTurn;
+        info = whiteTurn? "Turn of white" : "Turn of black";
+        gameRunning = checkHomes();
+    }
 }
 
 //WTF How it works
