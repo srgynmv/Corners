@@ -110,7 +110,6 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
 
         //Printing new possible moves
         bool white = this->itemAt(event->x(), event->y())->type() == Checker::White ? true : false;
-        qDebug() << white;
         selectionItems = printPossibleMoves(event, white);
     }
 }

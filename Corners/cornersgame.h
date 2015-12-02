@@ -17,7 +17,25 @@ class CornersGame;
 
 class CornersGame : public QMainWindow
 {
+
     Q_OBJECT
+
+    class GameProcess
+    {
+        friend class CornersGame;
+    public:
+        GameProcess(CornersGame* parent);
+        ~GameProcess();
+        void game();
+        void getMove();
+        bool checkHomes();
+        QEventLoop *loop;
+        void resetGame();
+        void swapSelectionMode();
+    private:
+        bool whiteTurn;
+        CornersGame* parent;
+    };
 
 public:
     explicit CornersGame(QWidget *parent = 0);
@@ -27,13 +45,12 @@ public:
 public slots:
     void newGameClicked();
     void resizeView(QResizeEvent *event);
-        void game();
 
 signals:
     void newGameStarted();
-    void finishGame();
 
 private:
+    GameProcess* gameProcess;
     Ui::CornersGame *ui;
     myGameFieldView *gameFieldView;
     QGraphicsScene *scene;
@@ -46,11 +63,6 @@ private:
     SettingsDialog *settingsDialog;
     RulesDialog *rulesDialog;
     ExitDialog *exitDialog;
-
-    QEventLoop *newGameLoop;
-    QEventLoop *loop;
-    void getMove(bool white);
-    bool checkHomes();
 };
 
 #endif // CORNERSGAME_H

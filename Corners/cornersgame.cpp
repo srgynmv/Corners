@@ -43,17 +43,13 @@ CornersGame::CornersGame(QWidget *parent) :
     settingsDialog = new SettingsDialog;
     rulesDialog = new RulesDialog;
     exitDialog = new ExitDialog;
-    newGameLoop = new QEventLoop;
-    loop = new QEventLoop;
+    gameProcess = NULL;
 
     QObject::connect(ui->newGameButton, SIGNAL(clicked(bool)), this, SLOT(newGameClicked()));
     QObject::connect(gameFieldView, SIGNAL(resized(QResizeEvent *)), this, SLOT(resizeView(QResizeEvent *)));
     QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
     QObject::connect(ui->settingsButton, SIGNAL(clicked(bool)), this->settingsDialog, SLOT(exec()));
     QObject::connect(ui->rulesButton, SIGNAL(clicked(bool)), this->rulesDialog, SLOT(exec()));
-    QObject::connect(gameFieldView, SIGNAL(checkerMoved()), loop, SLOT(quit()));
-    QObject::connect(this, SIGNAL(newGameStarted()), this, SLOT(game()));
-    QObject::connect(this, SIGNAL(finishGame()), loop, SLOT(quit()));
 }
 
 void CornersGame::newGameClicked()
@@ -70,98 +66,128 @@ void CornersGame::newGameClicked()
         whiteCheckerTexture = whiteCheckerTexture.scaled(cellSize, cellSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         blackCheckerTexture = blackCheckerTexture.scaled(cellSize, cellSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-        //Creating white checkers
+        //Creating white and black checkers
         for (int i = 0; i < this->numberOfCheckers; ++i)
         {
-            WhiteChecker *checker = new WhiteChecker(whiteCheckerTexture);
-            if (whiteCheckers[i] == NULL) whiteCheckers[i] = checker;
-            scene->addItem(checker);
-            checker->setPos((i % 3) *  gameFieldView->cellSize , scene->height() - (i / 3 + 1) *  gameFieldView->cellSize - 2);
+            WhiteChecker *whiteChecker = new WhiteChecker(whiteCheckerTexture);
+            BlackChecker *blackChecker = new BlackChecker(blackCheckerTexture);
+
+            if (whiteCheckers[i] == NULL)
+            {
+                scene->addItem(whiteChecker);
+                whiteCheckers[i] = whiteChecker;
+            }
+            if (blackCheckers[i] == NULL)
+            {
+                blackCheckers[i] = blackChecker;
+                scene->addItem(blackChecker);
+            }
         }
 
-        //Creating black checkers
-        for (int i = 0; i < this->numberOfCheckers; ++i)
+        if (gameProcess == NULL)
         {
-            BlackChecker *checker = new BlackChecker(blackCheckerTexture);
-            if (blackCheckers[i] == NULL) blackCheckers[i] = checker;
-            scene->addItem(checker);
-            checker->setPos(scene->width() - (i % 3 + 1) *  gameFieldView->cellSize - 2, (i / 3) *  gameFieldView->cellSize );
+            gameProcess = new GameProcess(this);
+            gameProcess->resetGame();
+            gameProcess->game();
         }
-
-        emit newGameStarted();
+        else
+        {
+            gameProcess->resetGame();
+        }
     }
     else
     {
         //Out asking dialog about new game
         if (newGameDialog->exec())
         {
-            qDebug() << "Call exit()";
-            //Emit signal for finishing game
-            gameRunning = false;
-            emit finishGame();
-            qDebug() << "Emit finishing()";
             //TODO...:
             //Update scene, matrix, etc.
-
-            for (int i = 0; i < this->numberOfCheckers; ++i)
-            {
-                whiteCheckers[i]->setPos((i % 3) *  gameFieldView->cellSize , scene->height() - (i / 3 + 1) *  gameFieldView->cellSize - 2);
-                blackCheckers[i]->setPos(scene->width() - (i % 3 + 1) *  gameFieldView->cellSize - 2, (i / 3) *  gameFieldView->cellSize );
-            }
-
-            //Waiting for last game finish
-            qDebug() << "Waiting for finish...";
-            newGameLoop->exec();
-            qDebug() << "prev game closed";
-            emit newGameStarted();
+            gameProcess->resetGame();
         }
     }
 }
 
-void CornersGame::getMove(bool white)
+CornersGame::GameProcess::GameProcess(CornersGame* parent)
 {
-    for (int i = 0; i < this->numberOfCheckers; ++i)
+    this->loop = new QEventLoop;
+    this->parent = parent;
+
+    QObject::connect(parent->gameFieldView, SIGNAL(checkerMoved()), loop, SLOT(quit()));
+}
+
+void CornersGame::GameProcess::resetGame()
+{
+    //Reseting position
+    for (int i = 0; i < parent->numberOfCheckers; ++i)
     {
-        //Setup selection
-        blackCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, !white);
-        whiteCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, white);
+        parent->whiteCheckers[i]->setPos((i % 3) *  parent->gameFieldView->cellSize , parent->scene->height() - (i / 3 + 1) *  parent->gameFieldView->cellSize - 2);
+        parent->blackCheckers[i]->setPos(parent->scene->width() - (i % 3 + 1) *  parent->gameFieldView->cellSize - 2, (i / 3) *  parent->gameFieldView->cellSize );
     }
+    //Making new turn
+    whiteTurn = rand() % 2;
+    qDebug() << "New player: " << whiteTurn;
+    swapSelectionMode();
+
+    QString info = "Started new game!\n\n";
+    info += whiteTurn ? "Turn of white" : "Turn of black";
+    parent->ui->infoLabel->setText(info);
+
+}
+
+void CornersGame::GameProcess::getMove()
+{
+    swapSelectionMode();
     qDebug() << "In getMove()";
     loop->exec();
     qDebug() << "Loop quit";
 }
 
-bool CornersGame::checkHomes()
+void CornersGame::GameProcess::swapSelectionMode()
+{
+    for (int i = 0; i < parent->numberOfCheckers; ++i)
+    {
+        //Setup selection
+        parent->blackCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, !whiteTurn);
+        parent->whiteCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, whiteTurn);
+    }
+}
+
+bool CornersGame::GameProcess::checkHomes()
 {
     //TODO...
     qDebug() << "In checkHomes()";
-    if (exitDialog->result() == QDialog::Accepted || !gameRunning)
+    if (parent->exitDialog->result() == QDialog::Accepted || !parent->gameRunning)
     {
         return false;
     }
-    qDebug() << gameRunning;
+    qDebug() << "gameRunning: " << parent->gameRunning;
     return true;
 }
 
-void CornersGame::game()
+void CornersGame::GameProcess::game()
 {
-    gameRunning = true;
+    parent->gameRunning = true;
     qDebug() << "Started new game() func";
-    bool whiteTurn = rand() % 2;
-    QString info = whiteTurn ? "Turn of white" : "Turn of black";
+    whiteTurn = rand() % 2;
+    QString info = "Started new game!\n\n";
+    info += whiteTurn ? "Turn of white" : "Turn of black";
 
-    while (gameRunning)
+    while (parent->gameRunning)
     {
-        ui->infoLabel->setText(info);
+        parent->ui->infoLabel->setText(info);
 
-        getMove(whiteTurn);
+        getMove();
 
         whiteTurn = !whiteTurn;
         info = whiteTurn? "Turn of white" : "Turn of black";
-        gameRunning = checkHomes();
+        parent->gameRunning = checkHomes();
     }
 
-    newGameLoop->quit();
+}
+
+CornersGame::GameProcess::~GameProcess()
+{
+    loop->quit();
 }
 
 //WTF How it works
@@ -179,7 +205,10 @@ void CornersGame::closeEvent(QCloseEvent *event)
     if (exitDialog->exec())
     {
         //Closing game loop event
-        loop->quit();
+        if (gameProcess != NULL)
+        {
+            delete gameProcess;
+        }
         event->accept();
     }
     else
