@@ -9,8 +9,9 @@ myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView(), TRANS
     this->setMinimumHeight(height);
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->rowAndColumnCount = 8;
     fieldSize = height;
-    this->cellSize = fieldSize / 8;
+    this->cellSize = fieldSize / rowAndColumnCount;
     this->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
     checkerSelected = false;
@@ -50,28 +51,67 @@ QVector<QGraphicsRectItem *> myGameFieldView::printPossibleMoves(QMouseEvent *ev
 
     QVector<QGraphicsRectItem *> result;
 
+    QGraphicsItem *item;
     if (white)
     {
-        QGraphicsRectItem *right = this->scene()->addRect((checker_j + 1) * cellSize, checker_i * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
-        QGraphicsRectItem *up = this->scene()->addRect((checker_j) * cellSize, (checker_i - 1) * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+        if (canGoTo(checker_j, checker_i - 1))
+        {
+            item = this->itemAt(mapFromScene(checker_j * cellSize + cellSize / 2, (checker_i - 1) * cellSize + cellSize / 2));
 
-        result.push_back(up);
-        result.push_back(right);
-        this->scene()->addItem(up);
-        this->scene()->addItem(right);
+            if (item->type() != WhiteChecker::Type && item->type() != BlackChecker::Type)
+            {
+                QGraphicsRectItem *up = this->scene()->addRect((checker_j) * cellSize, (checker_i - 1) * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+                result.push_back(up);
+            }
+        }
+        if (canGoTo(checker_j + 1, checker_i))
+        {
+            item = this->itemAt(mapFromScene((checker_j + 1) * cellSize + cellSize / 2, checker_i * cellSize + cellSize / 2));
+
+            if (item->type() != WhiteChecker::Type && item->type() != BlackChecker::Type)
+            {
+                QGraphicsRectItem *right = this->scene()->addRect((checker_j + 1) * cellSize, checker_i * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+                result.push_back(right);
+            }
+        }
     }
     else
     {
-        QGraphicsRectItem *left = this->scene()->addRect((checker_j - 1) * cellSize, checker_i * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
-        QGraphicsRectItem *down = this->scene()->addRect((checker_j) * cellSize, (checker_i + 1) * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+        if (canGoTo(checker_j - 1, checker_i))
+        {
+            item = this->itemAt(mapFromScene((checker_j - 1) * cellSize + cellSize / 2, (checker_i) * cellSize + cellSize / 2));
 
-        result.push_back(down);
-        result.push_back(left);
-        this->scene()->addItem(down);
-        this->scene()->addItem(left);
+            if (item->type() != WhiteChecker::Type && item->type() != BlackChecker::Type)
+            {
+               QGraphicsRectItem *left = this->scene()->addRect((checker_j - 1) * cellSize, checker_i * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+               result.push_back(left);
+            }
+        }
+        if (canGoTo(checker_j, checker_i + 1))
+        {
+            item = this->itemAt(mapFromScene((checker_j) * cellSize + cellSize / 2, (checker_i + 1) * cellSize + cellSize / 2));
+
+            if (item->type() != WhiteChecker::Type && item->type() != BlackChecker::Type)
+            {
+                QGraphicsRectItem *down = this->scene()->addRect((checker_j) * cellSize, (checker_i + 1) * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+                result.push_back(down);
+            }
+        }
     }
 
     return result;
+}
+
+bool myGameFieldView::canGoTo(int j, int i)
+{
+   if (j >= 0 && j < rowAndColumnCount && i >= 0 && i < rowAndColumnCount)
+   {
+       return true;
+   }
+   else
+   {
+       return false;
+   }
 }
 
 void myGameFieldView::mousePressEvent(QMouseEvent *event)

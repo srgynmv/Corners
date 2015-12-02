@@ -23,9 +23,10 @@ public:
     double fieldSize;
     double cellSize;
     bool checkerSelected;
+    bool canGoTo(int j, int i);
     QVector<QGraphicsRectItem *> printPossibleMoves(QMouseEvent *event, bool white);
     void erasePossibleMoves();
-
+    int rowAndColumnCount;
 private:
     const int TRANSPARENSY;
     QVector<QGraphicsRectItem *> selectionItems;

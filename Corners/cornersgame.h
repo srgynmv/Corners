@@ -32,6 +32,7 @@ class CornersGame : public QMainWindow
         QEventLoop *loop;
         void resetGame();
         void swapSelectionMode();
+        void winnerIsWhite(bool whiteWin);
     private:
         bool whiteTurn;
         CornersGame* parent;

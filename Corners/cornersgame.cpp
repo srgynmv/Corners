@@ -79,8 +79,8 @@ void CornersGame::newGameClicked()
             }
             if (blackCheckers[i] == NULL)
             {
-                blackCheckers[i] = blackChecker;
                 scene->addItem(blackChecker);
+                blackCheckers[i] = blackChecker;
             }
         }
 
@@ -132,6 +132,8 @@ void CornersGame::GameProcess::resetGame()
     info += whiteTurn ? "Turn of white" : "Turn of black";
     parent->ui->infoLabel->setText(info);
 
+    parent->gameRunning = true;
+
 }
 
 void CornersGame::GameProcess::getMove()
@@ -155,12 +157,45 @@ void CornersGame::GameProcess::swapSelectionMode()
 bool CornersGame::GameProcess::checkHomes()
 {
     //TODO...
+    //Check checker at it's home
+
     qDebug() << "In checkHomes()";
-    if (parent->exitDialog->result() == QDialog::Accepted || !parent->gameRunning)
+    if (parent->exitDialog->result() == QDialog::Accepted)
     {
         return false;
     }
-    qDebug() << "gameRunning: " << parent->gameRunning;
+
+    //Checking new homes
+    int whiteInNewHomeCount = 0;
+    int blackInNewHomeCount = 0;
+
+    for (int i = 0; i < parent->numberOfCheckers; ++i)
+    {
+        int blackX = (i % 3) *  parent->gameFieldView->cellSize + parent->gameFieldView->cellSize / 2;
+        int blackY = parent->scene->height() - (i / 3 + 1) *  parent->gameFieldView->cellSize - 2 + parent->gameFieldView->cellSize / 2;
+        int whiteX = parent->scene->width() - (i % 3 + 1) *  parent->gameFieldView->cellSize - 2 + parent->gameFieldView->cellSize / 2;
+        int whiteY = (i / 3) *  parent->gameFieldView->cellSize + parent->gameFieldView->cellSize / 2;
+
+        if (parent->gameFieldView->itemAt(parent->gameFieldView->mapFromScene(whiteX, whiteY))->type() == WhiteChecker::Type)
+        {
+            whiteInNewHomeCount++;
+        }
+        if (parent->gameFieldView->itemAt(parent->gameFieldView->mapFromScene(blackX, blackY))->type() == WhiteChecker::Type)
+        {
+            blackInNewHomeCount++;
+        }
+    }
+
+    if (whiteInNewHomeCount == parent->numberOfCheckers)
+    {
+        winnerIsWhite(true);
+        return false;
+    }
+    if (blackInNewHomeCount == parent->numberOfCheckers)
+    {
+        winnerIsWhite(false);
+        return false;
+    }
     return true;
 }
 
@@ -183,6 +218,29 @@ void CornersGame::GameProcess::game()
         parent->gameRunning = checkHomes();
     }
 
+}
+
+void CornersGame::GameProcess::winnerIsWhite(bool whiteWin)
+{
+    QString info;
+
+    if (whiteWin)
+    {
+        info = "Winner is white!";
+    }
+    else
+    {
+        info = "Winner is black!";
+    }
+
+    parent->ui->infoLabel->setText(info);
+
+    //Disabling selection
+    for (int i = 0; i < parent->numberOfCheckers; ++i)
+    {
+        parent->blackCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, false);
+        parent->whiteCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, false);
+    }
 }
 
 CornersGame::GameProcess::~GameProcess()
