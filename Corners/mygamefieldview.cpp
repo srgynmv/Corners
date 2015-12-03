@@ -14,6 +14,8 @@ myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView(), TRANS
     this->cellSize = fieldSize / rowAndColumnCount;
     this->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
+    green = QColor(0, 255, 0, TRANSPARENSY);
+
     checkerSelected = false;
 }
 
@@ -38,73 +40,86 @@ void myGameFieldView::erasePossibleMoves()
     selectionItems.squeeze();
 }
 
-QVector<QGraphicsRectItem *> myGameFieldView::printPossibleMoves(QMouseEvent *event, bool white)
+QGraphicsItem* myGameFieldView::itemAtCell(int i, int j)
+{
+    return this->itemAt(mapFromScene(j * cellSize + cellSize / 2, i * cellSize + cellSize / 2));
+}
+
+bool myGameFieldView::putRect(int i, int j, QVector<QGraphicsRectItem *> &result)
+{
+    if (!canGoTo(i, j))
+    {
+        return false;
+    }
+
+    QGraphicsItem *item = this->itemAtCell(i, j);
+
+    if (item->type() != WhiteChecker::Type && item->type() != BlackChecker::Type && item->type() != QGraphicsRectItem::Type)
+    {
+        QGraphicsRectItem *rect = this->scene()->addRect(j * cellSize, i * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
+        result.push_back(rect);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+QVector<QGraphicsRectItem *> myGameFieldView::createPossibleMoves(QMouseEvent *event, bool white)
 {
     QPoint clickPoint(event->x(), event->y());
     QPointF clickPointF;
     clickPointF = this->mapToScene(clickPoint);
 
-    int checker_i = clickPointF.y() / cellSize;
-    int checker_j = clickPointF.x() / cellSize;
-
-    QColor green = QColor(0, 255, 0, TRANSPARENSY);
+    int checkerI = clickPointF.y() / cellSize;
+    int checkerJ = clickPointF.x() / cellSize;
 
     QVector<QGraphicsRectItem *> result;
+
+    if (white)
+    {
+        putRect(checkerI - 1, checkerJ, result);
+        putRect(checkerI, checkerJ + 1, result);
+    }
+    else
+    {
+        putRect(checkerI, checkerJ - 1, result);
+        putRect(checkerI + 1, checkerJ, result);
+    }
+
+    createAdditionalMoves(checkerI, checkerJ, result, white, true);
+    return result;
+}
+
+void myGameFieldView::createAdditionalMoves(int i, int j, QVector<QGraphicsRectItem *> &result, bool white, bool firstRectangle)
+{
+    bool rectangleAdded = putRect(i, j, result);
+    if (!rectangleAdded && !firstRectangle)
+    {
+        return;
+    }
 
     QGraphicsItem *item;
     if (white)
     {
-        if (canGoTo(checker_j, checker_i - 1))
-        {
-            item = this->itemAt(mapFromScene(checker_j * cellSize + cellSize / 2, (checker_i - 1) * cellSize + cellSize / 2));
-
-            if (item->type() != WhiteChecker::Type && item->type() != BlackChecker::Type)
-            {
-                QGraphicsRectItem *up = this->scene()->addRect((checker_j) * cellSize, (checker_i - 1) * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
-                result.push_back(up);
-            }
-        }
-        if (canGoTo(checker_j + 1, checker_i))
-        {
-            item = this->itemAt(mapFromScene((checker_j + 1) * cellSize + cellSize / 2, checker_i * cellSize + cellSize / 2));
-
-            if (item->type() != WhiteChecker::Type && item->type() != BlackChecker::Type)
-            {
-                QGraphicsRectItem *right = this->scene()->addRect((checker_j + 1) * cellSize, checker_i * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
-                result.push_back(right);
-            }
-        }
+        item = itemAtCell(i - 1, j);
+        if (item->type() == BlackChecker::Type) createAdditionalMoves(i - 2, j, result, white, false);
+        item = itemAtCell(i, j + 1);
+        if (item->type() == BlackChecker::Type) createAdditionalMoves(i, j + 2, result, white, false);
     }
     else
     {
-        if (canGoTo(checker_j - 1, checker_i))
-        {
-            item = this->itemAt(mapFromScene((checker_j - 1) * cellSize + cellSize / 2, (checker_i) * cellSize + cellSize / 2));
-
-            if (item->type() != WhiteChecker::Type && item->type() != BlackChecker::Type)
-            {
-               QGraphicsRectItem *left = this->scene()->addRect((checker_j - 1) * cellSize, checker_i * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
-               result.push_back(left);
-            }
-        }
-        if (canGoTo(checker_j, checker_i + 1))
-        {
-            item = this->itemAt(mapFromScene((checker_j) * cellSize + cellSize / 2, (checker_i + 1) * cellSize + cellSize / 2));
-
-            if (item->type() != WhiteChecker::Type && item->type() != BlackChecker::Type)
-            {
-                QGraphicsRectItem *down = this->scene()->addRect((checker_j) * cellSize, (checker_i + 1) * cellSize, cellSize, cellSize, QPen(Qt::NoPen), QBrush(green));
-                result.push_back(down);
-            }
-        }
+        item = itemAtCell(i, j - 1);
+        if (item->type() == WhiteChecker::Type) createAdditionalMoves(i, j - 2, result, white, false);
+        item = itemAtCell(i + 1, j);
+        if (item->type() == WhiteChecker::Type) createAdditionalMoves(i + 2, j, result, white, false);
     }
-
-    return result;
 }
 
-bool myGameFieldView::canGoTo(int j, int i)
+bool myGameFieldView::canGoTo(int i, int j)
 {
-   if (j >= 0 && j < rowAndColumnCount && i >= 0 && i < rowAndColumnCount)
+   if (i >= 0 && i < rowAndColumnCount && j >= 0 && j < rowAndColumnCount)
    {
        return true;
    }
@@ -150,8 +165,6 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
 
         //Printing new possible moves
         bool white = this->itemAt(event->x(), event->y())->type() == Checker::White ? true : false;
-        selectionItems = printPossibleMoves(event, white);
+        selectionItems = createPossibleMoves(event, white);
     }
 }
-
-

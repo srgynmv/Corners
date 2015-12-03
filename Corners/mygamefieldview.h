@@ -16,6 +16,8 @@ signals:
     void checkerMoved();
 
 public:
+    QColor green;
+
     myGameFieldView(int width, int height);
     virtual int heightForWidth(int width) const;
     virtual void resizeEvent(QResizeEvent *event);
@@ -23,10 +25,13 @@ public:
     double fieldSize;
     double cellSize;
     bool checkerSelected;
-    bool canGoTo(int j, int i);
-    QVector<QGraphicsRectItem *> printPossibleMoves(QMouseEvent *event, bool white);
+    bool canGoTo(int i, int j);
+    QVector<QGraphicsRectItem *> createPossibleMoves(QMouseEvent *event, bool white);
     void erasePossibleMoves();
     int rowAndColumnCount;
+    bool putRect(int i, int j, QVector<QGraphicsRectItem *> &result);
+    QGraphicsItem* itemAtCell(int i, int j);
+    void createAdditionalMoves(int i, int j, QVector<QGraphicsRectItem *> &result, bool white, bool firstRectangle);
 private:
     const int TRANSPARENSY;
     QVector<QGraphicsRectItem *> selectionItems;

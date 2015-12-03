@@ -123,6 +123,11 @@ void CornersGame::GameProcess::resetGame()
         parent->whiteCheckers[i]->setPos((i % 3) *  parent->gameFieldView->cellSize , parent->scene->height() - (i / 3 + 1) *  parent->gameFieldView->cellSize - 2);
         parent->blackCheckers[i]->setPos(parent->scene->width() - (i % 3 + 1) *  parent->gameFieldView->cellSize - 2, (i / 3) *  parent->gameFieldView->cellSize );
     }
+    //Deleting old selecting rectangles
+
+    parent->gameFieldView->erasePossibleMoves();
+    parent->gameFieldView->checkerSelected = false;
+
     //Making new turn
     whiteTurn = rand() % 2;
     qDebug() << "New player: " << whiteTurn;
@@ -171,20 +176,23 @@ bool CornersGame::GameProcess::checkHomes()
 
     for (int i = 0; i < parent->numberOfCheckers; ++i)
     {
-        int blackX = (i % 3) *  parent->gameFieldView->cellSize + parent->gameFieldView->cellSize / 2;
-        int blackY = parent->scene->height() - (i / 3 + 1) *  parent->gameFieldView->cellSize - 2 + parent->gameFieldView->cellSize / 2;
-        int whiteX = parent->scene->width() - (i % 3 + 1) *  parent->gameFieldView->cellSize - 2 + parent->gameFieldView->cellSize / 2;
-        int whiteY = (i / 3) *  parent->gameFieldView->cellSize + parent->gameFieldView->cellSize / 2;
+        int blackI = i % 3;
+        int blackJ = parent->gameFieldView->rowAndColumnCount - (i / 3) - 1;
+        int whiteI = parent->gameFieldView->rowAndColumnCount - (i / 3) - 1;
+        int whiteJ = i % 3;
 
-        if (parent->gameFieldView->itemAt(parent->gameFieldView->mapFromScene(whiteX, whiteY))->type() == WhiteChecker::Type)
-        {
-            whiteInNewHomeCount++;
-        }
-        if (parent->gameFieldView->itemAt(parent->gameFieldView->mapFromScene(blackX, blackY))->type() == WhiteChecker::Type)
+        if (parent->gameFieldView->itemAtCell(whiteI, whiteJ)->type() == BlackChecker::Type)
         {
             blackInNewHomeCount++;
         }
+        if (parent->gameFieldView->itemAtCell(blackI, blackJ)->type() == WhiteChecker::Type)
+        {
+            whiteInNewHomeCount++;
+        }
     }
+
+    qDebug() << "WhiteInNewHomeCount: " << whiteInNewHomeCount;
+    qDebug() << "BlackInNewHomeCount: " << blackInNewHomeCount;
 
     if (whiteInNewHomeCount == parent->numberOfCheckers)
     {
