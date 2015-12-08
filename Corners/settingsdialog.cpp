@@ -12,6 +12,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     this->playingWithComputer = ui->computerRadioButton->isChecked();
     QObject::connect(ui->playerRadioButton, SIGNAL(clicked(bool)), this, SLOT(changeDifficulty()));
     QObject::connect(ui->computerRadioButton, SIGNAL(clicked(bool)), this, SLOT(changeDifficulty()));
+
+    //Because game with computer not added yet
+    //ui->computerRadioButton->setEnabled(false);
 }
 
 void SettingsDialog::changeDifficulty()

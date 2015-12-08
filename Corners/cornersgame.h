@@ -10,33 +10,20 @@
 #include <QtDebug>
 #include <settingsdialog.h>
 #include <rulesdialog.h>
+#include <solutiontree.h>
 
 namespace Ui {
 class CornersGame;
 }
+
+class GameProcess;
 
 class CornersGame : public QMainWindow
 {
 
     Q_OBJECT
 
-    class GameProcess
-    {
-        friend class CornersGame;
-    public:
-        GameProcess(CornersGame* parent);
-        ~GameProcess();
-        void game();
-        void getMove();
-        bool checkHomes();
-        QEventLoop *loop;
-        void resetGame();
-        void swapSelectionMode();
-        void winnerIsWhite(bool whiteWin);
-    private:
-        bool whiteTurn;
-        CornersGame* parent;
-    };
+    friend class GameProcess;
 
 public:
     explicit CornersGame(QWidget *parent = 0);
@@ -64,6 +51,75 @@ private:
     SettingsDialog *settingsDialog;
     RulesDialog *rulesDialog;
     ExitDialog *exitDialog;
+};
+
+class Player
+{
+public:
+    enum Type
+    {
+        HUMAN, COMPUTER
+    };
+
+    Player(Type newType, QString name, QString color) :  playerName(name), playerType(newType), checkerColor(color) {}
+
+private:
+
+    QString playerName;
+    Type playerType;
+    QString checkerColor;
+    SolutionTree *AI;
+
+public:
+
+    void setSolutionTree(SolutionTree *NewAI)
+    {
+        AI = NewAI;
+    }
+
+    Type type()
+    {
+        return playerType;
+    }
+
+    QString name()
+    {
+        return playerName;
+    }
+
+    QString color()
+    {
+        return checkerColor;
+    }
+
+    SolutionTree::Move getMoveFromAI(SolutionTree::State* state)
+    {
+        return AI->getMove(state);
+    }
+};
+
+
+class GameProcess
+{
+    friend class CornersGame;
+
+public:
+    GameProcess(CornersGame* parent);
+    ~GameProcess();
+    void game();
+    void getMove();
+    bool checkHomes();
+    QEventLoop *loop;
+    void resetGame();
+    void swapSelectionMode();
+    void winnerIs(bool whiteWin);
+    QVector<QVector<SolutionTree::CellType> > getStateField();
+    Player *whiteCheckerPlayer;
+    Player *blackCheckerPlayer;
+    Player *currentPlayer;
+private:
+    bool whiteTurn;
+    CornersGame* parent;
 };
 
 #endif // CORNERSGAME_H

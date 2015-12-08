@@ -104,16 +104,16 @@ void myGameFieldView::createAdditionalMoves(int i, int j, QVector<QGraphicsRectI
     if (white)
     {
         item = itemAtCell(i - 1, j);
-        if (item->type() == BlackChecker::Type) createAdditionalMoves(i - 2, j, result, white, false);
+        if (item != NULL && item->type() == BlackChecker::Type) createAdditionalMoves(i - 2, j, result, white, false);
         item = itemAtCell(i, j + 1);
-        if (item->type() == BlackChecker::Type) createAdditionalMoves(i, j + 2, result, white, false);
+        if (item != NULL && item->type() == BlackChecker::Type) createAdditionalMoves(i, j + 2, result, white, false);
     }
     else
     {
         item = itemAtCell(i, j - 1);
-        if (item->type() == WhiteChecker::Type) createAdditionalMoves(i, j - 2, result, white, false);
+        if (item != NULL && item->type() == WhiteChecker::Type) createAdditionalMoves(i, j - 2, result, white, false);
         item = itemAtCell(i + 1, j);
-        if (item->type() == WhiteChecker::Type) createAdditionalMoves(i + 2, j, result, white, false);
+        if (item != NULL && item->type() == WhiteChecker::Type) createAdditionalMoves(i + 2, j, result, white, false);
     }
 }
 

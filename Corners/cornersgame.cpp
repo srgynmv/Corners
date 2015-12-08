@@ -107,15 +107,18 @@ void CornersGame::newGameClicked()
     }
 }
 
-CornersGame::GameProcess::GameProcess(CornersGame* parent)
+GameProcess::GameProcess(CornersGame* parent)
 {
     this->loop = new QEventLoop;
     this->parent = parent;
 
+    whiteCheckerPlayer = NULL;
+    blackCheckerPlayer = NULL;
+
     QObject::connect(parent->gameFieldView, SIGNAL(checkerMoved()), loop, SLOT(quit()));
 }
 
-void CornersGame::GameProcess::resetGame()
+void GameProcess::resetGame()
 {
     //Reseting position
     for (int i = 0; i < parent->numberOfCheckers; ++i)
@@ -128,38 +131,89 @@ void CornersGame::GameProcess::resetGame()
     parent->gameFieldView->erasePossibleMoves();
     parent->gameFieldView->checkerSelected = false;
 
+    //Import settings
+    if (whiteCheckerPlayer != NULL) delete whiteCheckerPlayer;
+    if (blackCheckerPlayer != NULL) delete blackCheckerPlayer;
+    whiteCheckerPlayer = new Player(Player::HUMAN, "Sergey", "white");
+
+    if (parent->settingsDialog->playingWithComputer)
+    {
+        blackCheckerPlayer = new Player(Player::COMPUTER, "AI", "black");
+    }
+    else
+    {
+        blackCheckerPlayer = new Player(Player::HUMAN, "Liubov", "black");
+    }
+
     //Making new turn
-    whiteTurn = rand() % 2;
-    qDebug() << "New player: " << whiteTurn;
+    currentPlayer = (rand() % 2) ? whiteCheckerPlayer : blackCheckerPlayer;
+    qDebug() << "First turn of : " << currentPlayer->name();
     swapSelectionMode();
 
-    QString info = "Started new game!\n\n";
-    info += whiteTurn ? "Turn of white" : "Turn of black";
+    if (parent->settingsDialog->playingWithComputer)
+    {
+        blackCheckerPlayer->setSolutionTree(new SolutionTree(parent->gameFieldView->rowAndColumnCount, SolutionTree::Black, blackCheckerPlayer == currentPlayer, parent->numberOfCheckers));
+    }
+
+    //Print information for player
+    QString info = "Started new game!\n\n Game mode:\n";
+    info += parent->settingsDialog->playingWithComputer ? "With computer\n\n" : "Two players\n\n";
+    info += "Turn of: " + currentPlayer->color() + " (" + currentPlayer->name() + ")";
     parent->ui->infoLabel->setText(info);
 
     parent->gameRunning = true;
 
 }
 
-void CornersGame::GameProcess::getMove()
+QVector<QVector<SolutionTree::CellType> > GameProcess::getStateField()
+{
+    QVector<QVector<SolutionTree::CellType> > result(parent->gameFieldView->rowAndColumnCount, QVector<SolutionTree::CellType> (parent->gameFieldView->rowAndColumnCount, SolutionTree::None));
+    for (int i = 0; i < result.size(); ++i)
+    {
+        for (int j = 0; j < result.size(); ++j)
+        {
+            if (parent->gameFieldView->itemAtCell(i, j)->type() == WhiteChecker::Type)
+            {
+                result[i][j] = currentPlayer->color() == "white" ? SolutionTree::Own : SolutionTree::Enemy;
+            }
+            if (parent->gameFieldView->itemAtCell(i, j)->type() == BlackChecker::Type)
+            {
+                result[i][j] = currentPlayer->color() == "black" ? SolutionTree::Own : SolutionTree::Enemy;
+            }
+        }
+    }
+    return result;
+}
+
+void GameProcess::getMove()
 {
     swapSelectionMode();
     qDebug() << "In getMove()";
-    loop->exec();
+    if (currentPlayer->type() == Player::HUMAN)
+    {
+        loop->exec();
+    }
+    else
+    {
+        SolutionTree::State *state = new SolutionTree::State(getStateField());
+        SolutionTree::Move move = currentPlayer->getMoveFromAI(state);
+        parent->gameFieldView->itemAtCell(move.fromI, move.fromJ)->setPos(move.toJ * parent->gameFieldView->cellSize, move.toI * parent->gameFieldView->cellSize);
+    }
     qDebug() << "Loop quit";
 }
 
-void CornersGame::GameProcess::swapSelectionMode()
+void GameProcess::swapSelectionMode()
 {
     for (int i = 0; i < parent->numberOfCheckers; ++i)
     {
         //Setup selection
-        parent->blackCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, !whiteTurn);
-        parent->whiteCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, whiteTurn);
+
+        parent->whiteCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, currentPlayer == whiteCheckerPlayer && whiteCheckerPlayer->type() == Player::HUMAN);
+        parent->blackCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, currentPlayer == blackCheckerPlayer && blackCheckerPlayer->type() == Player::HUMAN);
     }
 }
 
-bool CornersGame::GameProcess::checkHomes()
+bool GameProcess::checkHomes()
 {
     //TODO...
     //Check checker at it's home
@@ -196,39 +250,38 @@ bool CornersGame::GameProcess::checkHomes()
 
     if (whiteInNewHomeCount == parent->numberOfCheckers)
     {
-        winnerIsWhite(true);
+        winnerIs(true);
         return false;
     }
     if (blackInNewHomeCount == parent->numberOfCheckers)
     {
-        winnerIsWhite(false);
+        winnerIs(false);
         return false;
     }
     return true;
 }
 
-void CornersGame::GameProcess::game()
+void GameProcess::game()
 {
-    parent->gameRunning = true;
     qDebug() << "Started new game() func";
-    whiteTurn = rand() % 2;
-    QString info = "Started new game!\n\n";
-    info += whiteTurn ? "Turn of white" : "Turn of black";
+
+    QString info;
 
     while (parent->gameRunning)
     {
-        parent->ui->infoLabel->setText(info);
-
         getMove();
 
-        whiteTurn = !whiteTurn;
-        info = whiteTurn? "Turn of white" : "Turn of black";
+        currentPlayer = (currentPlayer == blackCheckerPlayer) ? whiteCheckerPlayer : blackCheckerPlayer;
+
+        info = "Turn of: " + currentPlayer->color() + " (" + currentPlayer->name() + ")";
+        parent->ui->infoLabel->setText(info);
+
         parent->gameRunning = checkHomes();
     }
 
 }
 
-void CornersGame::GameProcess::winnerIsWhite(bool whiteWin)
+void GameProcess::winnerIs(bool whiteWin)
 {
     QString info;
 
@@ -251,7 +304,7 @@ void CornersGame::GameProcess::winnerIsWhite(bool whiteWin)
     }
 }
 
-CornersGame::GameProcess::~GameProcess()
+GameProcess::~GameProcess()
 {
     loop->quit();
 }

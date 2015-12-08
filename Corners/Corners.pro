@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     newgamedialog.cpp \
     exitdialog.cpp \
     settingsdialog.cpp \
-    rulesdialog.cpp
+    rulesdialog.cpp \
+    solutiontree.cpp
 
 HEADERS  += cornersgame.h \
     mygamefieldview.h \
@@ -27,7 +28,8 @@ HEADERS  += cornersgame.h \
     newgamedialog.h \
     exitdialog.h \
     settingsdialog.h \
-    rulesdialog.h
+    rulesdialog.h \
+    solutiontree.h
 
 FORMS    += cornersgame.ui \
     newgamedialog.ui \
