@@ -45,11 +45,11 @@ public:
         State(QVector< QVector< CellType > > newField, bool moveOf, Move newMove);
     };
 
+    static const int TREE_SIZE = 5;
     bool canGoTo(State* state, int i, int j);
     QSet<Move> getPossibleMoves(State *state, int i, int j);
     void makeSolutionTree(State *state, int count);
     Color color;
-    static const int TREE_SIZE = 5;
     SolutionTree(int size, SolutionTree::Color color, bool moveOfAI, int numberOfCheckers);
     Move getMove(State *state);
     State* root;

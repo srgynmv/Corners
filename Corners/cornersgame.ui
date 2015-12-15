@@ -25,6 +25,9 @@
   <property name="windowTitle">
    <string>CornersGame</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0,0">
     <property name="leftMargin">

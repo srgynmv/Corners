@@ -12,8 +12,10 @@ class myGameFieldView  : public QGraphicsView
     friend class CornersGame;
 
 signals:
-    void resized(QResizeEvent *event);
     void checkerMoved();
+
+public slots:
+    void updateView(QEventLoop *loop);
 
 public:
     QColor green;
@@ -22,6 +24,7 @@ public:
     virtual int heightForWidth(int width) const;
     virtual void resizeEvent(QResizeEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     double fieldSize;
     double cellSize;
     bool checkerSelected;

@@ -46,7 +46,6 @@ CornersGame::CornersGame(QWidget *parent) :
     gameProcess = NULL;
 
     QObject::connect(ui->newGameButton, SIGNAL(clicked(bool)), this, SLOT(newGameClicked()));
-    QObject::connect(gameFieldView, SIGNAL(resized(QResizeEvent *)), this, SLOT(resizeView(QResizeEvent *)));
     QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
     QObject::connect(ui->settingsButton, SIGNAL(clicked(bool)), this->settingsDialog, SLOT(exec()));
     QObject::connect(ui->rulesButton, SIGNAL(clicked(bool)), this->rulesDialog, SLOT(exec()));
@@ -107,7 +106,7 @@ void CornersGame::newGameClicked()
     }
 }
 
-GameProcess::GameProcess(CornersGame* parent)
+GameProcess::GameProcess(CornersGame* parent) : QEvent()
 {
     this->loop = new QEventLoop;
     this->parent = parent;
@@ -116,6 +115,7 @@ GameProcess::GameProcess(CornersGame* parent)
     blackCheckerPlayer = NULL;
 
     QObject::connect(parent->gameFieldView, SIGNAL(checkerMoved()), loop, SLOT(quit()));
+    //QObject::connect(this, SIGNAL(updateView(QEventLoop*)), parent->gameFieldView, SLOT(updateView(QEventLoop*)));
 }
 
 void GameProcess::resetGame()
@@ -188,18 +188,23 @@ QVector<QVector<SolutionTree::CellType> > GameProcess::getStateField()
 void GameProcess::getMove()
 {
     swapSelectionMode();
-    qDebug() << "In getMove()";
+    //qDebug() << "In getMove()";
     if (currentPlayer->type() == Player::HUMAN)
     {
+        qDebug() << "Getting move from player...";
         loop->exec();
+        qDebug() << "Got a move." << endl;
     }
     else
     {
+        qDebug() << "Getting move from AI...";
         SolutionTree::State *state = new SolutionTree::State(getStateField());
         SolutionTree::Move move = currentPlayer->getMoveFromAI(state);
         parent->gameFieldView->itemAtCell(move.fromI, move.fromJ)->setPos(move.toJ * parent->gameFieldView->cellSize, move.toI * parent->gameFieldView->cellSize);
+        qDebug() << "Got a move." << endl;
     }
-    qDebug() << "Loop quit";
+    //TODO: Update view
+    emit updateView(loop);
 }
 
 void GameProcess::swapSelectionMode()
@@ -218,7 +223,7 @@ bool GameProcess::checkHomes()
     //TODO...
     //Check checker at it's home
 
-    qDebug() << "In checkHomes()";
+    //qDebug() << "In checkHomes()";
     if (parent->exitDialog->result() == QDialog::Accepted)
     {
         return false;
@@ -228,6 +233,8 @@ bool GameProcess::checkHomes()
     int whiteInNewHomeCount = 0;
     int blackInNewHomeCount = 0;
 
+    qDebug() << endl << "CHECK_HOMES" << endl;
+
     for (int i = 0; i < parent->numberOfCheckers; ++i)
     {
         int blackI = i % 3;
@@ -235,10 +242,12 @@ bool GameProcess::checkHomes()
         int whiteI = parent->gameFieldView->rowAndColumnCount - (i / 3) - 1;
         int whiteJ = i % 3;
 
+        //qDebug() << parent->gameFieldView->itemAtCell(whiteI, whiteJ)->type();
         if (parent->gameFieldView->itemAtCell(whiteI, whiteJ)->type() == BlackChecker::Type)
         {
             blackInNewHomeCount++;
         }
+        //qDebug() << parent->gameFieldView->itemAtCell(blackI, blackJ)->type() << endl;
         if (parent->gameFieldView->itemAtCell(blackI, blackJ)->type() == WhiteChecker::Type)
         {
             whiteInNewHomeCount++;
@@ -269,6 +278,7 @@ void GameProcess::game()
 
     while (parent->gameRunning)
     {
+        parent->repaint();
         getMove();
 
         currentPlayer = (currentPlayer == blackCheckerPlayer) ? whiteCheckerPlayer : blackCheckerPlayer;
@@ -309,26 +319,13 @@ GameProcess::~GameProcess()
     loop->quit();
 }
 
-//WTF How it works
-void CornersGame::resizeView(QResizeEvent *event)
-{
-    double newFieldSize = qMin(event->size().width(), event->size().height());
-    //Scales the all view to the new size:
-    gameFieldView->scale(newFieldSize / gameFieldView->fieldSize, newFieldSize / gameFieldView->fieldSize);
-    gameFieldView->fieldSize = newFieldSize;
-}
-
 //Reimplementing closeEvent() for message box
 void CornersGame::closeEvent(QCloseEvent *event)
 {
     if (exitDialog->exec())
     {
         //Closing game loop event
-        if (gameProcess != NULL)
-        {
-            delete gameProcess;
-        }
-        event->accept();
+        QMainWindow::closeEvent(event);
     }
     else
     {
@@ -339,5 +336,11 @@ void CornersGame::closeEvent(QCloseEvent *event)
 CornersGame::~CornersGame()
 {
     qDebug() << "Destructor called";
+    delete newGameDialog;
+    delete settingsDialog;
+    delete rulesDialog;
+    delete exitDialog;
+    delete scene;
+    delete gameProcess;
     delete ui;
 }

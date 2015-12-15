@@ -2,6 +2,7 @@
 
 myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView(), TRANSPARENSY(50)
 {
+
     QSizePolicy policy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     policy.setHeightForWidth(true);
     this->setSizePolicy(policy);
@@ -27,7 +28,10 @@ int myGameFieldView::heightForWidth(int width) const
 void myGameFieldView::resizeEvent(QResizeEvent *event)
 {
     QGraphicsView::resizeEvent(event);
-    emit resized(event);
+    double newFieldSize = qMin(event->size().width(), event->size().height());
+    //Scales the all view to the new size:
+    this->scale(newFieldSize / this->fieldSize, newFieldSize / this->fieldSize);
+    this->fieldSize = newFieldSize;
 }
 
 void myGameFieldView::erasePossibleMoves()
@@ -37,7 +41,6 @@ void myGameFieldView::erasePossibleMoves()
         delete selectionItems[i];
     }
     selectionItems.resize(0);
-    selectionItems.squeeze();
 }
 
 QGraphicsItem* myGameFieldView::itemAtCell(int i, int j)
@@ -129,6 +132,11 @@ bool myGameFieldView::canGoTo(int i, int j)
    }
 }
 
+void myGameFieldView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    mousePressEvent(event);
+}
+
 void myGameFieldView::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsView::mousePressEvent(event);
@@ -147,24 +155,34 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
         int checkerJ = clickPointF.x() / cellSize;
 
         this->itemAt(selectedCheckerX, selectedCheckerY)->setPos(checkerJ * cellSize, checkerI * cellSize);
+        qDebug() << "GAMEVIEW: moving checker.";
+
         emit checkerMoved();
-        return;
     }
-
-    //Deleting all possible moves from field
-    checkerSelected = false;
-    erasePossibleMoves();
-
-    if (this->itemAt(event->x(), event->y())->isSelected() &&
-            (this->itemAt(event->x(), event->y())->type() == Checker::White || this->itemAt(event->x(), event->y())->type() == Checker::Black))
+    else
     {
-        checkerSelected = true;
+        //Deleting all possible moves from field
+        checkerSelected = false;
+        erasePossibleMoves();
 
-        selectedCheckerX = event->x();
-        selectedCheckerY = event->y();
+        if (this->itemAt(event->x(), event->y())->flags() == QGraphicsItem::ItemIsSelectable &&
+                (this->itemAt(event->x(), event->y())->type() == Checker::White || this->itemAt(event->x(), event->y())->type() == Checker::Black))
+        {
+            checkerSelected = true;
 
-        //Printing new possible moves
-        bool white = this->itemAt(event->x(), event->y())->type() == Checker::White ? true : false;
-        selectionItems = createPossibleMoves(event, white);
+            selectedCheckerX = event->x();
+            selectedCheckerY = event->y();
+
+            //Printing new possible moves
+            bool white = this->itemAt(event->x(), event->y())->type() == Checker::White ? true : false;
+            selectionItems = createPossibleMoves(event, white);
+        }
     }
+}
+
+void myGameFieldView::updateView(QEventLoop *loop)
+{
+    loop->exec();
+    QThread::msleep(100);
+    loop->exit();
 }

@@ -32,7 +32,6 @@ public:
 
 public slots:
     void newGameClicked();
-    void resizeView(QResizeEvent *event);
 
 signals:
     void newGameStarted();
@@ -101,8 +100,11 @@ public:
 
 class GameProcess
 {
+
     friend class CornersGame;
 
+signals:
+    void updateView(QEventLoop*);
 public:
     GameProcess(CornersGame* parent);
     ~GameProcess();

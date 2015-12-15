@@ -48,6 +48,7 @@ QSet<SolutionTree::Move> SolutionTree::getPossibleMoves(State *state, int i, int
     QSet<Move> result;
 
     Color checkerColor = this->color;
+
     if (state->field[i][j] ==  Enemy)
     {
         checkerColor = this->color == White ? Black : White;
@@ -156,6 +157,12 @@ SolutionTree::Move SolutionTree::getMove(State *state)
         makeSolutionTree(root, TREE_SIZE);
     }
 
+    if (root->child.size() == 0)
+    {
+        makeSolutionTree(root, TREE_SIZE);
+    }
+
+    //Moving to state that on screen
     if (!root->moveOfAI)
     {
         for (int i = 0; i < root->child.size(); ++i)
@@ -177,8 +184,12 @@ SolutionTree::Move SolutionTree::getMove(State *state)
 //        return Move();
 //    }
 
-    int index = rand() % root->child.size();
+    if (!root->moveOfAI)
+    {
+        throw QUnhandledException();
+    }
 
+    int index = rand() % root->child.size();
 
     Move move = root->child[index]->move;
 
