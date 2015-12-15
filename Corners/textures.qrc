@@ -4,6 +4,7 @@
         <file>resources/fieldTexture.png</file>
         <file>resources/whiteChess.png</file>
         <file>resources/blackChess.png</file>
+        <file>resources/icon.png</file>
     </qresource>
     <qresource prefix="/">
         <file>rules.html</file>

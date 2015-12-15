@@ -41,3 +41,5 @@ DISTFILES +=
 
 RESOURCES += \
     textures.qrc
+
+QMAKE_LFLAGS_RELEASE += -static -static-libgcc

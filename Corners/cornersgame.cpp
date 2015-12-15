@@ -50,6 +50,10 @@ CornersGame::CornersGame(QWidget *parent) :
     QObject::connect(ui->exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
     QObject::connect(ui->settingsButton, SIGNAL(clicked(bool)), this->settingsDialog, SLOT(exec()));
     QObject::connect(ui->rulesButton, SIGNAL(clicked(bool)), this->rulesDialog, SLOT(exec()));
+
+    //Setup window settings
+    setWindowTitle("Corners");
+    setWindowIcon(QIcon(":/textures/resources/icon.png"));
 }
 
 void CornersGame::newGameClicked()
