@@ -127,6 +127,17 @@ void SolutionTree::makeSolutionTree(State *state, int count)
 
 }
 
+void SolutionTree::deleteBranch(State *state)
+{
+    if (state == NULL) return;
+
+    for (int i = 0; i < state->child.size(); ++i)
+    {
+        deleteBranch(state->child[i]);
+    }
+    delete state;
+}
+
 SolutionTree::Move SolutionTree::getMove(State *state)
 {
     if (root == NULL)
@@ -142,16 +153,26 @@ SolutionTree::Move SolutionTree::getMove(State *state)
     }
 
     //Moving to state that on screen
+    State* newState = root;
+
+    //Find state from field in tree and delete other
     if (!root->moveOfAI)
     {
         for (int i = 0; i < root->child.size(); ++i)
         {
             if (state->field == root->child[i]->field)
             {
-                root = root->child[i];
+                newState = root->child[i];
+            }
+            else
+            {
+                deleteBranch(root->child[i]);
             }
         }
+        delete root;
     }
+
+    root = newState;
 
     if (root->child.size() == 0)
     {
@@ -168,9 +189,25 @@ SolutionTree::Move SolutionTree::getMove(State *state)
     Move move = root->child[index]->move;
 
     qDebug() << "Making move from " << move.fromI << "," << move.fromJ << "  to  " << move.toI << "," << move.toJ;
-    root = root->child[index];
+
+    newState = root->child[index];
+
+    //Delete other
+    for (int i = 0; i < root->child.size(); ++i)
+    {
+        if (root->child[i] != newState) deleteBranch(root->child[i]);
+    }
+    delete root;
+
+    root = newState;
+
     return move;
 
+}
+
+SolutionTree::~SolutionTree()
+{
+    deleteBranch(root);
 }
 
 SolutionTree::State::State(QVector< QVector< SolutionTree::CellType > > newField, bool moveOf) : field(newField), moveOfAI(moveOf) {}

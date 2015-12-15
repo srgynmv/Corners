@@ -1,6 +1,6 @@
 #include "mygamefieldview.h"
 
-myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView(), TRANSPARENSY(50)
+myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView(), transparensy(50)
 {
 
     QSizePolicy policy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -15,7 +15,7 @@ myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView(), TRANS
     this->cellSize = fieldSize / rowAndColumnCount;
     this->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
-    green = QColor(0, 255, 0, TRANSPARENSY);
+    green = QColor(0, 255, 0, transparensy);
 
     checkerSelected = false;
 }
@@ -69,15 +69,8 @@ bool myGameFieldView::putRect(int i, int j, QVector<QGraphicsRectItem *> &result
     }
 }
 
-QVector<QGraphicsRectItem *> myGameFieldView::createPossibleMoves(QMouseEvent *event, bool white)
+QVector<QGraphicsRectItem *> myGameFieldView::createPossibleMoves(int checkerI, int checkerJ, bool white)
 {
-    QPoint clickPoint(event->x(), event->y());
-    QPointF clickPointF;
-    clickPointF = this->mapToScene(clickPoint);
-
-    int checkerI = clickPointF.y() / cellSize;
-    int checkerJ = clickPointF.x() / cellSize;
-
     QVector<QGraphicsRectItem *> result;
 
     if (white)
@@ -132,6 +125,33 @@ bool myGameFieldView::canGoTo(int i, int j)
    }
 }
 
+bool myGameFieldView::canMakeMove(QString color)
+{
+    //Making invisible green rects to make move count
+    transparensy = 0;
+
+    for (int i = 0; i < rowAndColumnCount; ++i)
+    {
+        for (int j = 0; j < rowAndColumnCount; ++j)
+        {
+            if (color == "white" && itemAtCell(i, j)->type() == WhiteChecker::Type) selectionItems += createPossibleMoves(i, j, true);
+            if (color == "black" && itemAtCell(i, j)->type() == BlackChecker::Type) selectionItems += createPossibleMoves(i, j, false);
+        }
+    }
+    transparensy = 50;
+    int count = selectionItems.size();
+    erasePossibleMoves();
+
+    if (count != 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void myGameFieldView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     mousePressEvent(event);
@@ -151,8 +171,8 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
         QPointF clickPointF;
         clickPointF = this->mapToScene(clickPoint);
 
-        int checkerI = clickPointF.y() / cellSize;
-        int checkerJ = clickPointF.x() / cellSize;
+        int checkerI = (clickPointF.y() + 1) / cellSize;
+        int checkerJ = (clickPointF.x() + 1) / cellSize;
 
         this->itemAt(selectedCheckerX, selectedCheckerY)->setPos(checkerJ * cellSize, checkerI * cellSize);
         qDebug() << "GAMEVIEW: moving checker.";
@@ -175,7 +195,16 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
 
             //Printing new possible moves
             bool white = this->itemAt(event->x(), event->y())->type() == Checker::White ? true : false;
-            selectionItems = createPossibleMoves(event, white);
+
+            //Convert click point to cell coordinates
+            QPoint clickPoint(event->x(), event->y());
+            QPointF clickPointF;
+            clickPointF = this->mapToScene(clickPoint);
+
+            int checkerI = clickPointF.y() / cellSize;
+            int checkerJ = clickPointF.x() / cellSize;
+
+            selectionItems = createPossibleMoves(checkerI, checkerJ, white);
         }
     }
 }

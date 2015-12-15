@@ -92,8 +92,9 @@ void CornersGame::newGameClicked()
         }
         else
         {
-            newGameStarted = true;
+            //newGameStarted = true;
             gameProcess->resetGame();
+            gameProcess->game();
         }
     }
     else
@@ -225,10 +226,6 @@ void GameProcess::swapSelectionMode()
 
 bool GameProcess::canContinueGame()
 {
-    //TODO...
-    //Check if cant go.
-
-    //qDebug() << "In canContinueGame()";
     if (parent->exitDialog->result() == QDialog::Accepted)
     {
         return false;
@@ -238,7 +235,7 @@ bool GameProcess::canContinueGame()
     int whiteInNewHomeCount = 0;
     int blackInNewHomeCount = 0;
 
-    qDebug() << endl << "CHECK_HOMES" << endl;
+    qDebug() << endl << "CONTINUE_GAME" << endl;
 
     for (int i = 0; i < parent->numberOfCheckers; ++i)
     {
@@ -272,6 +269,21 @@ bool GameProcess::canContinueGame()
         winnerIs(false);
         return false;
     }
+
+    //Check opportunity to make move
+    if (!parent->gameFieldView->canMakeMove(currentPlayer->color()))
+    {
+        if (currentPlayer->color() == "white")
+        {
+            winnerIs(false); //If white cannot move - black is winner
+        }
+        else
+        {
+            winnerIs(true); //Otherwise, white is winner
+        }
+        return false;
+    }
+
     return true;
 }
 
@@ -295,12 +307,13 @@ void GameProcess::game()
             continue;
         }
 
+        parent->gameRunning = canContinueGame();
+        if (!parent->gameRunning) break;
+
         currentPlayer = (currentPlayer == blackCheckerPlayer) ? whiteCheckerPlayer : blackCheckerPlayer;
 
         info = "Turn of: " + currentPlayer->color() + " (" + currentPlayer->name() + ")";
         parent->ui->infoLabel->setText(info);
-
-        parent->gameRunning = canContinueGame();
     }
 
 }
