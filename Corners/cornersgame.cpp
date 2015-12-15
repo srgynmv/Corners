@@ -27,6 +27,7 @@ CornersGame::CornersGame(QWidget *parent) :
 
     //Because on a start game doesn't running
     gameRunning = false;
+    newGameStarted = false;
 
     //Setup number of checkers and resizing vectors
     numberOfCheckers = 9;
@@ -91,6 +92,7 @@ void CornersGame::newGameClicked()
         }
         else
         {
+            newGameStarted = true;
             gameProcess->resetGame();
         }
     }
@@ -101,12 +103,13 @@ void CornersGame::newGameClicked()
         {
             //TODO...:
             //Update scene, matrix, etc.
+            newGameStarted = true;
             gameProcess->resetGame();
         }
     }
 }
 
-GameProcess::GameProcess(CornersGame* parent) : QEvent()
+GameProcess::GameProcess(CornersGame* parent)
 {
     this->loop = new QEventLoop;
     this->parent = parent;
@@ -115,11 +118,14 @@ GameProcess::GameProcess(CornersGame* parent) : QEvent()
     blackCheckerPlayer = NULL;
 
     QObject::connect(parent->gameFieldView, SIGNAL(checkerMoved()), loop, SLOT(quit()));
-    //QObject::connect(this, SIGNAL(updateView(QEventLoop*)), parent->gameFieldView, SLOT(updateView(QEventLoop*)));
+    QObject::connect(parent, SIGNAL(updateView(QEventLoop*)), parent->gameFieldView, SLOT(updateView(QEventLoop*)));
 }
 
 void GameProcess::resetGame()
 {
+    //Stop QEventLoop if it working
+    parent->gameRunning = false;
+    loop->exit();
     //Reseting position
     for (int i = 0; i < parent->numberOfCheckers; ++i)
     {
@@ -134,6 +140,7 @@ void GameProcess::resetGame()
     //Import settings
     if (whiteCheckerPlayer != NULL) delete whiteCheckerPlayer;
     if (blackCheckerPlayer != NULL) delete blackCheckerPlayer;
+
     whiteCheckerPlayer = new Player(Player::HUMAN, "Sergey", "white");
 
     if (parent->settingsDialog->playingWithComputer)
@@ -203,8 +210,6 @@ void GameProcess::getMove()
         parent->gameFieldView->itemAtCell(move.fromI, move.fromJ)->setPos(move.toJ * parent->gameFieldView->cellSize, move.toI * parent->gameFieldView->cellSize);
         qDebug() << "Got a move." << endl;
     }
-    //TODO: Update view
-    emit updateView(loop);
 }
 
 void GameProcess::swapSelectionMode()
@@ -218,12 +223,12 @@ void GameProcess::swapSelectionMode()
     }
 }
 
-bool GameProcess::checkHomes()
+bool GameProcess::canContinueGame()
 {
     //TODO...
-    //Check checker at it's home
+    //Check if cant go.
 
-    //qDebug() << "In checkHomes()";
+    //qDebug() << "In canContinueGame()";
     if (parent->exitDialog->result() == QDialog::Accepted)
     {
         return false;
@@ -281,12 +286,21 @@ void GameProcess::game()
         parent->repaint();
         getMove();
 
+        //TODO: Update view
+        emit parent->updateView(loop);
+
+        if (parent->newGameStarted)
+        {
+            parent->newGameStarted = false;
+            continue;
+        }
+
         currentPlayer = (currentPlayer == blackCheckerPlayer) ? whiteCheckerPlayer : blackCheckerPlayer;
 
         info = "Turn of: " + currentPlayer->color() + " (" + currentPlayer->name() + ")";
         parent->ui->infoLabel->setText(info);
 
-        parent->gameRunning = checkHomes();
+        parent->gameRunning = canContinueGame();
     }
 
 }

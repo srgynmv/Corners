@@ -48,6 +48,7 @@ public:
     static const int TREE_SIZE = 5;
     bool canGoTo(State* state, int i, int j);
     QSet<Move> getPossibleMoves(State *state, int i, int j);
+    QSet<Move> getAdditionalMoves(State *state, int i, int j, int ni, int nj, Color &checkerColor, bool firstMove);
     void makeSolutionTree(State *state, int count);
     Color color;
     SolutionTree(int size, SolutionTree::Color color, bool moveOfAI, int numberOfCheckers);

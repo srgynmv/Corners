@@ -34,9 +34,11 @@ public slots:
     void newGameClicked();
 
 signals:
-    void newGameStarted();
+    void updateView(QEventLoop*);
 
 private:
+    bool newGameStarted;
+
     GameProcess* gameProcess;
     Ui::CornersGame *ui;
     myGameFieldView *gameFieldView;
@@ -103,14 +105,12 @@ class GameProcess
 
     friend class CornersGame;
 
-signals:
-    void updateView(QEventLoop*);
 public:
     GameProcess(CornersGame* parent);
     ~GameProcess();
     void game();
     void getMove();
-    bool checkHomes();
+    bool canContinueGame();
     QEventLoop *loop;
     void resetGame();
     void swapSelectionMode();

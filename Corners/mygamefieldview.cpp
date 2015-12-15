@@ -182,7 +182,8 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
 
 void myGameFieldView::updateView(QEventLoop *loop)
 {
+    //Start timer 50ms and call loop->quit() after timeout
+    QTimer::singleShot(50, loop, SLOT(quit()));
+    //Force main thread to sleep and wakeUp a gameFieldView
     loop->exec();
-    QThread::msleep(100);
-    loop->exit();
 }

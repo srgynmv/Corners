@@ -33,7 +33,7 @@ SolutionTree::SolutionTree(int size, Color color, bool moveOfAI, int numberOfChe
 
 bool SolutionTree::canGoTo(State* state, int i, int j)
 {
-   if (i >= 0 && i < state->field.size() && j >= 0 && j < state->field.size() && state->field[i][j] == None)
+   if (i >= 0 && i < state->field.size() && j >= 0 && j < state->field.size())
    {
        return true;
    }
@@ -56,68 +56,47 @@ QSet<SolutionTree::Move> SolutionTree::getPossibleMoves(State *state, int i, int
 
     if (checkerColor == White)
     {
-        if (canGoTo(state, i - 1, j)) result.insert(Move(i, j, i - 1, j));
-        if (canGoTo(state, i, j + 1)) result.insert(Move(i, j, i, j + 1));
+        if (canGoTo(state, i - 1, j) && state->field[i - 1][j] == None) result.insert(Move(i, j, i - 1, j));
+        if (canGoTo(state, i, j + 1) && state->field[i][j + 1] == None) result.insert(Move(i, j, i, j + 1));
     }
     else
     {
-        if (canGoTo(state, i, j - 1)) result.insert(Move(i, j, i, j - 1));
-        if (canGoTo(state, i + 1, j)) result.insert(Move(i, j, i + 1, j));
+        if (canGoTo(state, i, j - 1) && state->field[i][j - 1] == None) result.insert(Move(i, j, i, j - 1));
+        if (canGoTo(state, i + 1, j) && state->field[i + 1][j] == None) result.insert(Move(i, j, i + 1, j));
+    }
+
+    result += getAdditionalMoves(state, i, j, i, j, checkerColor, true);
+    return result;
+}
+
+QSet<SolutionTree::Move> SolutionTree::getAdditionalMoves(State *state, int i, int j, int ni, int nj, Color &checkerColor, bool firstMove)
+{
+    QSet<Move> result;
+
+    if ((canGoTo(state, ni, nj) && state->field[ni][nj] == None) || firstMove)
+    {
+        if (!firstMove) result.insert(Move(i, j, ni, nj));
+    }
+    else
+    {
+        return result;
+    }
+
+    CellType type = checkerColor == this->color ? Enemy : Own;
+
+    if (checkerColor == White)
+    {
+        if (canGoTo(state, ni - 1, nj) && state->field[ni - 1][nj] == type) result += getAdditionalMoves(state, i, j, ni - 2, nj, checkerColor, false);
+        if (canGoTo(state, ni, nj + 1) && state->field[ni][nj + 1] == type) result += getAdditionalMoves(state, i, j, ni, nj + 2, checkerColor, false);
+    }
+    else
+    {
+        if (canGoTo(state, ni, nj - 1) && state->field[ni][nj - 1] == type) result += getAdditionalMoves(state, i, j, ni, nj - 2, checkerColor, false);
+        if (canGoTo(state, ni + 1, nj) && state->field[ni + 1][nj] == type) result += getAdditionalMoves(state, i, j, ni + 2, nj, checkerColor, false);
     }
 
     return result;
-//    QVector<QGraphicsRectItem *> myGameFieldView::createPossibleMoves(QMouseEvent *event, bool white)
-//    {
-//        QPoint clickPoint(event->x(), event->y());
-//        QPointF clickPointF;
-//        clickPointF = this->mapToScene(clickPoint);
-
-//        int checkerI = clickPointF.y() / cellSize;
-//        int checkerJ = clickPointF.x() / cellSize;
-
-//        QVector<QGraphicsRectItem *> result;
-
-//        if (white)
-//        {
-//            putRect(checkerI - 1, checkerJ, result);
-//            putRect(checkerI, checkerJ + 1, result);
-//        }
-//        else
-//        {
-//            putRect(checkerI, checkerJ - 1, result);
-//            putRect(checkerI + 1, checkerJ, result);
-//        }
-
-//        createAdditionalMoves(checkerI, checkerJ, result, white, true);
-//        return result;
-//    }
-
-//    void myGameFieldView::createAdditionalMoves(int i, int j, QVector<QGraphicsRectItem *> &result, bool white, bool firstRectangle)
-//    {
-//        bool rectangleAdded = putRect(i, j, result);
-//        if (!rectangleAdded && !firstRectangle)
-//        {
-//            return;
-//        }
-
-//        QGraphicsItem *item;
-//        if (white)
-//        {
-//            item = itemAtCell(i - 1, j);
-//            if (item != NULL && item->type() == BlackChecker::Type) createAdditionalMoves(i - 2, j, result, white, false);
-//            item = itemAtCell(i, j + 1);
-//            if (item != NULL && item->type() == BlackChecker::Type) createAdditionalMoves(i, j + 2, result, white, false);
-//        }
-//        else
-//        {
-//            item = itemAtCell(i, j - 1);
-//            if (item != NULL && item->type() == WhiteChecker::Type) createAdditionalMoves(i, j - 2, result, white, false);
-//            item = itemAtCell(i + 1, j);
-//            if (item != NULL && item->type() == WhiteChecker::Type) createAdditionalMoves(i + 2, j, result, white, false);
-//        }
-//    }
 }
-
 
 void SolutionTree::makeSolutionTree(State *state, int count)
 {
@@ -178,11 +157,6 @@ SolutionTree::Move SolutionTree::getMove(State *state)
     {
         makeSolutionTree(root, TREE_SIZE);
     }
-
-//    if (root->child.size() == 0)
-//    {
-//        return Move();
-//    }
 
     if (!root->moveOfAI)
     {
