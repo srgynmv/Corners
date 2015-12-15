@@ -142,7 +142,7 @@ void GameProcess::resetGame()
     if (whiteCheckerPlayer != NULL) delete whiteCheckerPlayer;
     if (blackCheckerPlayer != NULL) delete blackCheckerPlayer;
 
-    whiteCheckerPlayer = new Player(Player::HUMAN, "Sergey", "white");
+    whiteCheckerPlayer = new Player(Player::HUMAN, parent->settingsDialog->whitePlayerName(), "white");
 
     if (parent->settingsDialog->playingWithComputer)
     {
@@ -150,7 +150,7 @@ void GameProcess::resetGame()
     }
     else
     {
-        blackCheckerPlayer = new Player(Player::HUMAN, "Liubov", "black");
+        blackCheckerPlayer = new Player(Player::HUMAN, parent->settingsDialog->blackPlayerName(), "black");
     }
 
     //Making new turn

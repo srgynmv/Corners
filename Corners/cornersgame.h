@@ -108,17 +108,19 @@ class GameProcess
 public:
     GameProcess(CornersGame* parent);
     ~GameProcess();
+
     void game();
     void getMove();
     bool canContinueGame();
-    QEventLoop *loop;
     void resetGame();
     void swapSelectionMode();
     void winnerIs(bool whiteWin);
     QVector<QVector<SolutionTree::CellType> > getStateField();
+
     Player *whiteCheckerPlayer;
     Player *blackCheckerPlayer;
     Player *currentPlayer;
+    QEventLoop *loop;
 private:
     bool whiteTurn;
     CornersGame* parent;

@@ -15,6 +15,10 @@ class SettingsDialog : public QDialog
 public:
     explicit SettingsDialog(QWidget *parent = 0);
     ~SettingsDialog();
+
+    QString whitePlayerName();
+    QString blackPlayerName();
+
     bool playingWithComputer;
 
 public slots:

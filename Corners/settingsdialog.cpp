@@ -31,6 +31,16 @@ void SettingsDialog::changeDifficulty()
     }
 }
 
+QString SettingsDialog::whitePlayerName()
+{
+    return ui->whitePlayerName->text();
+}
+
+QString SettingsDialog::blackPlayerName()
+{
+    return ui->blackPlayerName->text();
+}
+
 SettingsDialog::~SettingsDialog()
 {
     delete ui;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>143</width>
-    <height>292</height>
+    <width>228</width>
+    <height>399</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,6 +35,74 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="playerNameLayout">
+     <item>
+      <widget class="QWidget" name="playerNameWidget" native="true">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="whitePlayerName">
+          <property name="text">
+           <string>Player1</string>
+          </property>
+          <property name="maxLength">
+           <number>16</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="blackPlayerName">
+          <property name="inputMask">
+           <string/>
+          </property>
+          <property name="text">
+           <string>Player2</string>
+          </property>
+          <property name="maxLength">
+           <number>16</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="whiteLabel">
+          <property name="text">
+           <string>White:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="blackLabel">
+          <property name="text">
+           <string>Black:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="playersNameLabel">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Players name:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+       <zorder>verticalLayoutWidget</zorder>
+       <zorder>playersNameLabel</zorder>
+       <zorder>whitePlayerName</zorder>
+       <zorder>blackPlayerName</zorder>
+       <zorder>whiteLabel</zorder>
+       <zorder>blackLabel</zorder>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QVBoxLayout" name="enemyLayout">

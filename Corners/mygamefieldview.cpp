@@ -174,10 +174,13 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
         int checkerI = (clickPointF.y() + 1) / cellSize;
         int checkerJ = (clickPointF.x() + 1) / cellSize;
 
-        this->itemAt(selectedCheckerX, selectedCheckerY)->setPos(checkerJ * cellSize, checkerI * cellSize);
-        qDebug() << "GAMEVIEW: moving checker.";
+        if (itemAtCell(checkerI, checkerJ)->type() != WhiteChecker::Type && itemAtCell(checkerI, checkerJ)->type() != BlackChecker::Type)
+        {
+            this->itemAt(selectedCheckerX, selectedCheckerY)->setPos(checkerJ * cellSize, checkerI * cellSize);
+            qDebug() << "GAMEVIEW: moving checker.";
 
-        emit checkerMoved();
+            emit checkerMoved();
+        }
     }
     else
     {
