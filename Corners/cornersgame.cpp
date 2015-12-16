@@ -54,10 +54,14 @@ CornersGame::CornersGame(QWidget *parent) :
     //Setup window settings
     setWindowTitle("Corners");
     setWindowIcon(QIcon(":/textures/resources/icon.png"));
+
+    ui->infoLabel->setVisible(false);
 }
 
 void CornersGame::newGameClicked()
 {
+    ui->infoLabel->setVisible(true);
+
     if (!gameRunning)
     {
         //Getting and resizing textures

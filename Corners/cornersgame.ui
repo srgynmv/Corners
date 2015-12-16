@@ -26,7 +26,10 @@
    <string>CornersGame</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">QMainWindow#CornersGame {background-image: url(:/textures/resources/windowBackground.jpg);}
+
+QPushButton {
+					}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0,0">
@@ -93,6 +96,7 @@
           <pointsize>28</pointsize>
           <weight>75</weight>
           <bold>true</bold>
+          <stylestrategy>PreferAntialias</stylestrategy>
          </font>
         </property>
         <property name="text">
@@ -148,8 +152,14 @@
           <bold>true</bold>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="text">
          <string>New Game</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -159,7 +169,7 @@
          <enum>Qt::Vertical</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::Minimum</enum>
+         <enum>QSizePolicy::Maximum</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -176,6 +186,21 @@
           <pointsize>10</pointsize>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="lineWidth">
+         <number>3</number>
+        </property>
+        <property name="midLineWidth">
+         <number>0</number>
+        </property>
         <property name="text">
          <string>Player1 move</string>
         </property>
@@ -184,6 +209,9 @@
         </property>
         <property name="wordWrap">
          <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>10</number>
         </property>
        </widget>
       </item>
@@ -214,8 +242,14 @@
           <pointsize>11</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="text">
          <string>Rules</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -233,8 +267,14 @@
           <pointsize>11</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="text">
          <string>Settings</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -252,8 +292,17 @@
           <pointsize>11</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
         <property name="text">
          <string>Exit</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

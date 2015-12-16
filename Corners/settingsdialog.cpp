@@ -48,6 +48,8 @@ int SettingsDialog::difficulty()
     if (ui->easyRadioButton->isChecked()) return 0;
     if (ui->mediumRadioButton->isChecked()) return 1;
     if (ui->hardRadioButton->isChecked()) return 2;
+    //If there will be some errors
+    return -1;
 }
 
 SettingsDialog::~SettingsDialog()

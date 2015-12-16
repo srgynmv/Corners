@@ -150,7 +150,7 @@ int SolutionTree::moveCost(State* state)
         cost *= 2;
     }
 
-    if (state->turnNumber < 55)
+    if (state->turnNumber <= 55)
     {
         if (color == White)
         {
