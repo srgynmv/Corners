@@ -164,7 +164,7 @@ void GameProcess::resetGame()
 
     if (parent->settingsDialog->playingWithComputer)
     {
-        blackCheckerPlayer->setSolutionTree(new SolutionTree(parent->gameFieldView->rowAndColumnCount, SolutionTree::Black, blackCheckerPlayer == currentPlayer, parent->numberOfCheckers));
+        blackCheckerPlayer->setSolutionTree(new SolutionTree(parent->gameFieldView->rowAndColumnCount, SolutionTree::Black, blackCheckerPlayer == currentPlayer, parent->numberOfCheckers, parent->settingsDialog->difficulty()));
     }
 
     //Print information for player

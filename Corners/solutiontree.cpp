@@ -13,10 +13,12 @@ void swap(SolutionTree::CellType &a, SolutionTree::CellType &b)
     b = tmp;
 }
 
-SolutionTree::SolutionTree(int size, Color color, bool moveOfAI, int numberOfCheckers)
+SolutionTree::SolutionTree(int size, Color color, bool moveOfAI, int numberOfCheckers, int difficulty)
 {
     qDebug() << endl << "------PLAYING WITH COMPUTER------" << endl;
+
     this->color = color;
+    this->difficulty = (Difficulty)difficulty;
 
     QVector< QVector < SolutionTree::CellType > > startField(size, QVector< SolutionTree::CellType > (size, None));
 
@@ -98,6 +100,59 @@ QSet<SolutionTree::Move> SolutionTree::getAdditionalMoves(State *state, int i, i
     return result;
 }
 
+int SolutionTree::moveCost(State* state)
+{
+    CellType type = !state->moveOfAI ? Own : Enemy;
+    Color color = this->color;
+    if (type == Enemy) color = color == Black ? White : Black;
+    //Check losing variants
+    for (int i = 0; i < 3; ++i)
+    {
+        int count = 0;
+        for (int j = 0; j < state->field.size(); ++j)
+        {
+            if ((color == White && state->field[i][j] == type) || (color == Black && state->field[j][i] == type)) count++;
+        }
+        if (count > 3) return 0;
+    }
+    for (int j = state->field.size() - 3; j < state->field.size(); ++j)
+    {
+        int count = 0;
+        for (int i = 0; i < state->field.size(); ++i)
+        {
+            if ((color == White && state->field[i][j] == type) || (color == Black && state->field[j][i] == type)) count++;
+        }
+        if (count > 3) return 0;
+    }
+
+    int cost;
+
+    //Making a non-zero cost
+    if (difficulty == Easy)
+    {
+        cost = rand() % state->field.size() + 1;
+    }
+    if (difficulty == Medium)
+    {
+        if (!rand() % 4)
+        {
+            cost = (int)sqrt((state->move.fromI - state->move.toI) * (state->move.fromI - state->move.toI) + (state->move.fromJ - state->move.toJ) * (state->move.fromJ - state->move.toJ)) + 1;
+            cost *= 2;
+        }
+        else
+        {
+            cost = rand() % state->field.size() + 1;
+        }
+    }
+    if (difficulty == Hard)
+    {
+        cost = (int)sqrt((state->move.fromI - state->move.toI) * (state->move.fromI - state->move.toI) + (state->move.fromJ - state->move.toJ) * (state->move.fromJ - state->move.toJ)) + 1;
+        cost *= 2;
+    }
+
+    return cost;
+}
+
 void SolutionTree::makeSolutionTree(State *state, int count)
 {
     if (count == 0) return;
@@ -120,6 +175,7 @@ void SolutionTree::makeSolutionTree(State *state, int count)
         swap(state->field[it->fromI][it->fromJ], state->field[it->toI][it->toJ]);
 
         state->child.push_back(new State(state->field, !state->moveOfAI, *it));
+        state->child.last()->cost = moveCost(state->child.last());      //Making cost of move
         makeSolutionTree(state->child.last(), count - 1);
 
         swap(state->field[it->fromI][it->fromJ], state->field[it->toI][it->toJ]);
@@ -184,12 +240,22 @@ SolutionTree::Move SolutionTree::getMove(State *state)
         throw QUnhandledException();
     }
 
-    int index = rand() % root->child.size();
+    //Make move with biggest cost (depends on difficulty)
+    int cost = - 1;
+    int index = 0;
+    for (int i = 0; i < root->child.size(); ++i)
+    {
+        if (root->child[i]->cost > cost)
+        {
+            cost = root->child[i]->cost;
+            index = i;
+        }
+    }
 
     Move move = root->child[index]->move;
 
     qDebug() << "Making move from " << move.fromI << "," << move.fromJ << "  to  " << move.toI << "," << move.toJ;
-
+    qDebug() << "Move cost: " << root->child[index]->cost;
     newState = root->child[index];
 
     //Delete other

@@ -41,6 +41,13 @@ QString SettingsDialog::blackPlayerName()
     return ui->blackPlayerName->text();
 }
 
+int SettingsDialog::difficulty()
+{
+    if (ui->easyRadioButton->isChecked()) return 0;
+    if (ui->mediumRadioButton->isChecked()) return 1;
+    if (ui->hardRadioButton->isChecked()) return 2;
+}
+
 SettingsDialog::~SettingsDialog()
 {
     delete ui;

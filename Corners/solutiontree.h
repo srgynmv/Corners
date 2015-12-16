@@ -19,6 +19,11 @@ public:
         Enemy, Own, None
     };
 
+    enum Difficulty
+    {
+        Easy, Medium, Hard
+    };
+
     class Move
     {
     public:
@@ -41,6 +46,8 @@ public:
         QVector<QVector<CellType> > field;
         bool moveOfAI;
         Move move;
+        int cost;
+
         State(QVector< QVector< CellType > > newField, bool moveOf = false);
         State(QVector< QVector< CellType > > newField, bool moveOf, Move newMove);
     };
@@ -50,11 +57,13 @@ public:
     QSet<Move> getAdditionalMoves(State *state, int i, int j, int ni, int nj, Color &checkerColor, bool firstMove);
     void makeSolutionTree(State *state, int count);
     void deleteBranch(State *state);
-    SolutionTree(int size, SolutionTree::Color color, bool moveOfAI, int numberOfCheckers);
+    SolutionTree(int size, SolutionTree::Color color, bool moveOfAI, int numberOfCheckers, int difficulty);
     Move getMove(State *state);
+    int moveCost(State *state);
 
     static const int TREE_SIZE = 5;
     Color color;
+    Difficulty difficulty;
     State* root;
 
     ~SolutionTree();

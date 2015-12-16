@@ -18,6 +18,7 @@ public:
 
     QString whitePlayerName();
     QString blackPlayerName();
+    int difficulty();
 
     bool playingWithComputer;
 

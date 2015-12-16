@@ -43,3 +43,5 @@ RESOURCES += \
     textures.qrc
 
 QMAKE_LFLAGS_RELEASE += -static -static-libgcc
+
+RC_ICONS = icon.ico
