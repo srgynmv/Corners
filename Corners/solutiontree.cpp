@@ -125,7 +125,7 @@ int SolutionTree::moveCost(State* state)
         if (count > 3) return 0;
     }
 
-    int cost;
+    int cost = 0;
 
     //Making a non-zero cost
     if (difficulty == Easy)
@@ -134,7 +134,7 @@ int SolutionTree::moveCost(State* state)
     }
     if (difficulty == Medium)
     {
-        if (!rand() % 4)
+        if (!(rand() % 4))
         {
             cost = (int)sqrt((state->move.fromI - state->move.toI) * (state->move.fromI - state->move.toI) + (state->move.fromJ - state->move.toJ) * (state->move.fromJ - state->move.toJ)) + 1;
             cost *= 2;
@@ -148,6 +148,18 @@ int SolutionTree::moveCost(State* state)
     {
         cost = (int)sqrt((state->move.fromI - state->move.toI) * (state->move.fromI - state->move.toI) + (state->move.fromJ - state->move.toJ) * (state->move.fromJ - state->move.toJ)) + 1;
         cost *= 2;
+    }
+
+    if (state->turnNumber < 55)
+    {
+        if (color == White)
+        {
+            if (state->field.size() - 3 <= state->move.fromI && state->move.fromI < state->field.size() && 0 <= state->move.fromJ && state->move.fromJ < 3) cost = 11/*state->turnNumber / 5 + 1*/;
+        }
+        else
+        {
+            if (state->field.size() - 3 <= state->move.fromJ && state->move.fromJ < state->field.size() && 0 <= state->move.fromI && state->move.fromI < 3) cost = 11/*state->turnNumber / 5 + 1*/;
+        }
     }
 
     return cost;
@@ -174,7 +186,7 @@ void SolutionTree::makeSolutionTree(State *state, int count)
     {
         swap(state->field[it->fromI][it->fromJ], state->field[it->toI][it->toJ]);
 
-        state->child.push_back(new State(state->field, !state->moveOfAI, *it));
+        state->child.push_back(new State(state->field, !state->moveOfAI, *it, state->turnNumber + 1));
         state->child.last()->cost = moveCost(state->child.last());      //Making cost of move
         makeSolutionTree(state->child.last(), count - 1);
 
@@ -276,6 +288,11 @@ SolutionTree::~SolutionTree()
     deleteBranch(root);
 }
 
-SolutionTree::State::State(QVector< QVector< SolutionTree::CellType > > newField, bool moveOf) : field(newField), moveOfAI(moveOf) {}
-SolutionTree::State::State(QVector< QVector< SolutionTree::CellType > > newField, bool moveOf, Move newMove) : field(newField), moveOfAI(moveOf), move(newMove) {}
+SolutionTree::State::State(QVector< QVector< SolutionTree::CellType > > newField, bool moveOf, int newTurnNumber) : field(newField), moveOfAI(moveOf) , turnNumber(newTurnNumber) {}
+SolutionTree::State::State(QVector< QVector< SolutionTree::CellType > > newField, bool moveOf, Move newMove, int newTurnNumber) :
+    field(newField),
+    moveOfAI(moveOf),
+    move(newMove),
+    turnNumber(newTurnNumber)
+{}
 

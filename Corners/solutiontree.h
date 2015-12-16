@@ -11,7 +11,7 @@ class SolutionTree
 public:
     enum Color
     {
-        Black, White
+        Black, White, Other
     };
 
     enum CellType
@@ -47,9 +47,10 @@ public:
         bool moveOfAI;
         Move move;
         int cost;
+        int turnNumber;
 
-        State(QVector< QVector< CellType > > newField, bool moveOf = false);
-        State(QVector< QVector< CellType > > newField, bool moveOf, Move newMove);
+        State(QVector< QVector< CellType > > newField, bool moveOf = false, int newTurnNumber = 1);
+        State(QVector< QVector< CellType > > newField, bool moveOf, Move newMove, int newTurnNumber);
     };
 
     bool canGoTo(State* state, int i, int j);

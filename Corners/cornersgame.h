@@ -114,13 +114,15 @@ public:
     bool canContinueGame();
     void resetGame();
     void swapSelectionMode();
-    void winnerIs(bool whiteWin);
+    void winnerIs(SolutionTree::Color color);
     QVector<QVector<SolutionTree::CellType> > getStateField();
 
     Player *whiteCheckerPlayer;
     Player *blackCheckerPlayer;
     Player *currentPlayer;
     QEventLoop *loop;
+    int turnCounter;
+
 private:
     bool whiteTurn;
     CornersGame* parent;

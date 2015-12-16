@@ -167,9 +167,13 @@ void GameProcess::resetGame()
         blackCheckerPlayer->setSolutionTree(new SolutionTree(parent->gameFieldView->rowAndColumnCount, SolutionTree::Black, blackCheckerPlayer == currentPlayer, parent->numberOfCheckers, parent->settingsDialog->difficulty()));
     }
 
+    //Reset turn counter
+    turnCounter = 1;
+
     //Print information for player
-    QString info = "Started new game!\n\n Game mode:\n";
+    QString info = "Started new game!\n Game mode:\n";
     info += parent->settingsDialog->playingWithComputer ? "With computer\n\n" : "Two players\n\n";
+    info += "Turn #" + QString::number(turnCounter) + "\n\n";
     info += "Turn of: " + currentPlayer->color() + " (" + currentPlayer->name() + ")";
     parent->ui->infoLabel->setText(info);
 
@@ -236,8 +240,10 @@ bool GameProcess::canContinueGame()
     }
 
     //Checking new homes
-    int whiteInNewHomeCount = 0;
-    int blackInNewHomeCount = 0;
+    int whiteAtNewHomeCount = 0;
+    int blackAtNewHomeCount = 0;
+    int whiteAtHomeCount = 0;
+    int blackAtHomeCount = 0;
 
     qDebug() << endl << "CONTINUE_GAME" << endl;
 
@@ -248,29 +254,32 @@ bool GameProcess::canContinueGame()
         int whiteI = parent->gameFieldView->rowAndColumnCount - (i / 3) - 1;
         int whiteJ = i % 3;
 
-        //qDebug() << parent->gameFieldView->itemAtCell(whiteI, whiteJ)->type();
-        if (parent->gameFieldView->itemAtCell(whiteI, whiteJ)->type() == BlackChecker::Type)
+        if (parent->gameFieldView->itemAtCell(whiteI, whiteJ)->type() == BlackChecker::Type) blackAtNewHomeCount++;
+        if (parent->gameFieldView->itemAtCell(blackI, blackJ)->type() == WhiteChecker::Type) whiteAtNewHomeCount++;
+
+        if (turnCounter > 3 * parent->numberOfCheckers * 2)
         {
-            blackInNewHomeCount++;
-        }
-        //qDebug() << parent->gameFieldView->itemAtCell(blackI, blackJ)->type() << endl;
-        if (parent->gameFieldView->itemAtCell(blackI, blackJ)->type() == WhiteChecker::Type)
-        {
-            whiteInNewHomeCount++;
+            if (parent->gameFieldView->itemAtCell(whiteI, whiteJ)->type() == WhiteChecker::Type) whiteAtHomeCount++;
+            if (parent->gameFieldView->itemAtCell(blackI, blackJ)->type() == BlackChecker::Type) blackAtHomeCount++;
         }
     }
+    qDebug() << "whiteAtNewHomeCount: " << whiteAtNewHomeCount;
+    qDebug() << "blackAtNewHomeCount: " << blackAtNewHomeCount;
 
-    qDebug() << "WhiteInNewHomeCount: " << whiteInNewHomeCount;
-    qDebug() << "BlackInNewHomeCount: " << blackInNewHomeCount;
-
-    if (whiteInNewHomeCount == parent->numberOfCheckers)
+    //Check if any player has a checkers at home after turn 3 * numberOfCheckers
+    if (blackAtHomeCount != 0 && whiteAtHomeCount != 0)
     {
-        winnerIs(true);
+        winnerIs(SolutionTree::Other);
         return false;
     }
-    if (blackInNewHomeCount == parent->numberOfCheckers)
+    if (whiteAtNewHomeCount == parent->numberOfCheckers || blackAtHomeCount != 0)
     {
-        winnerIs(false);
+        winnerIs(SolutionTree::White);
+        return false;
+    }
+    if (blackAtNewHomeCount == parent->numberOfCheckers || whiteAtHomeCount != 0)
+    {
+        winnerIs(SolutionTree::Black);
         return false;
     }
 
@@ -279,11 +288,11 @@ bool GameProcess::canContinueGame()
     {
         if (currentPlayer->color() == "white")
         {
-            winnerIs(false); //If white cannot move - black is winner
+            winnerIs(SolutionTree::Black); //If white cannot move - black is winner
         }
         else
         {
-            winnerIs(true); //Otherwise, white is winner
+            winnerIs(SolutionTree::White); //Otherwise, white is winner
         }
         return false;
     }
@@ -315,24 +324,30 @@ void GameProcess::game()
         if (!parent->gameRunning) break;
 
         currentPlayer = (currentPlayer == blackCheckerPlayer) ? whiteCheckerPlayer : blackCheckerPlayer;
+        turnCounter++;
 
-        info = "Turn of: " + currentPlayer->color() + " (" + currentPlayer->name() + ")";
+        info = "Turn #" + QString::number(turnCounter) + "\n\n";
+        info += "Turn of: " + currentPlayer->color() + " (" + currentPlayer->name() + ")";
         parent->ui->infoLabel->setText(info);
     }
 
 }
 
-void GameProcess::winnerIs(bool whiteWin)
+void GameProcess::winnerIs(SolutionTree::Color color)
 {
     QString info;
 
-    if (whiteWin)
+    if (color == SolutionTree::White)
     {
         info = "Winner is white!";
     }
-    else
+    else if (color == SolutionTree::Black)
     {
         info = "Winner is black!";
+    }
+    else
+    {
+        info = "Draw!";
     }
 
     parent->ui->infoLabel->setText(info);

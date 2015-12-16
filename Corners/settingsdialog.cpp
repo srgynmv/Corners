@@ -23,11 +23,13 @@ void SettingsDialog::changeDifficulty()
     {
         ui->difficultyWidget->setEnabled(false);
         this->playingWithComputer = false;
+        ui->blackPlayerName->setEnabled(true);
     }
     else
     {
         ui->difficultyWidget->setEnabled(true);
         this->playingWithComputer = true;
+        ui->blackPlayerName->setEnabled(false);
     }
 }
 
