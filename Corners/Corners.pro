@@ -11,7 +11,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Corners
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
         cornersgame.cpp \
     mygamefieldview.cpp \
@@ -41,6 +40,8 @@ DISTFILES +=
 
 RESOURCES += \
     textures.qrc
+
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT
 
 QMAKE_LFLAGS_RELEASE += -static -static-libgcc
 

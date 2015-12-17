@@ -30,6 +30,7 @@ SolutionTree::SolutionTree(int size, Color color, bool moveOfAI, int numberOfChe
 
     root = new State(startField, moveOfAI);
 
+    srand(QTime::currentTime().msec());
     makeSolutionTree(root, this->TREE_SIZE);
 }
 
@@ -106,23 +107,31 @@ int SolutionTree::moveCost(State* state)
     Color color = this->color;
     if (type == Enemy) color = color == Black ? White : Black;
     //Check losing variants
-    for (int i = 0; i < 3; ++i)
+    int deltaRow = 0;
+    int deltaCol = 0;
+    for (int k = 0; k < 3; ++k)
     {
-        int count = 0;
-        for (int j = 0; j < state->field.size(); ++j)
+        int checkerAtRowCount = 0;
+        int checkerAtColCount = 0;
+        int allCount = 0;
+        if ((color == White && state->field[k][state->field.size() - k - 1] == type) || (color == Black && state->field[state->field.size() - k - 1][k] == type)) allCount--;
+
+        for (int i = k; i < state->field.size(); ++i)
         {
-            if ((color == White && state->field[i][j] == type) || (color == Black && state->field[j][i] == type)) count++;
+            if ((color == White && state->field[k][state->field.size() - 1 - i] == type) || (color == Black && state->field[state->field.size() - 1 - k][i] == type)) checkerAtRowCount++;
+            if ((color == White && state->field[i][state->field.size() - 1 - k] == type) || (color == Black && state->field[state->field.size() - 1 - i][k] == type)) checkerAtColCount++;
         }
-        if (count > 3) return 0;
-    }
-    for (int j = state->field.size() - 3; j < state->field.size(); ++j)
-    {
-        int count = 0;
-        for (int i = 0; i < state->field.size(); ++i)
+
+        allCount += checkerAtColCount + checkerAtRowCount;
+        if (checkerAtColCount <= 3 - k && checkerAtRowCount <= 3 - k && allCount <= 5 - 2 * k)
         {
-            if ((color == White && state->field[i][j] == type) || (color == Black && state->field[j][i] == type)) count++;
+                deltaRow += 3 - k - checkerAtRowCount;
+                deltaCol += 3 - k - checkerAtColCount;
         }
-        if (count > 3) return 0;
+        else
+        {
+            return 0;
+        }
     }
 
     int cost = 0;
@@ -136,29 +145,50 @@ int SolutionTree::moveCost(State* state)
     {
         if (!(rand() % 4))
         {
-            cost = (int)sqrt((state->move.fromI - state->move.toI) * (state->move.fromI - state->move.toI) + (state->move.fromJ - state->move.toJ) * (state->move.fromJ - state->move.toJ)) + 1;
-            cost *= 2;
+            cost = (int)(sqrt((state->move.fromI - state->move.toI) * (state->move.fromI - state->move.toI) + (state->move.fromJ - state->move.toJ) * (state->move.fromJ - state->move.toJ)) + 0.5);
+            cost = cost * 4;
         }
         else
         {
-            cost = rand() % state->field.size() + 1;
+            cost = rand() % (MAX_COST / 4) + 1;
         }
     }
     if (difficulty == Hard)
     {
-        cost = (int)sqrt((state->move.fromI - state->move.toI) * (state->move.fromI - state->move.toI) + (state->move.fromJ - state->move.toJ) * (state->move.fromJ - state->move.toJ)) + 1;
-        cost *= 2;
+        cost = (int)(sqrt((state->move.fromI - state->move.toI) * (state->move.fromI - state->move.toI) + (state->move.fromJ - state->move.toJ) * (state->move.fromJ - state->move.toJ)) + 0.5);
+        cost *= 4;
     }
 
+    //Make tree to leave home
     if (state->turnNumber <= 55)
     {
         if (color == White)
         {
-            if (state->field.size() - 3 <= state->move.fromI && state->move.fromI < state->field.size() && 0 <= state->move.fromJ && state->move.fromJ < 3) cost = 11/*state->turnNumber / 5 + 1*/;
+            //If checker at home
+            if (state->field.size() - 3 <= state->move.fromI && state->move.fromI < state->field.size() && 0 <= state->move.fromJ && state->move.fromJ < 3)
+            {
+                cost = MAX_COST - 1;
+                if (state->move.toI < state->field.size() - 3 || state->move.toJ >= 3) cost++;
+            }
+            //If one checker blocks other
+            if ((state->move.fromI == state->field.size() - 4 && state->field[state->move.fromI + 1][state->move.fromJ] == type) || (state->move.fromJ == 3 && state->field[state->move.fromI][state->move.fromJ - 1] == type))
+            {
+                cost = MAX_COST;
+            }
         }
         else
         {
-            if (state->field.size() - 3 <= state->move.fromJ && state->move.fromJ < state->field.size() && 0 <= state->move.fromI && state->move.fromI < 3) cost = 11/*state->turnNumber / 5 + 1*/;
+            //If checker at home
+            if (state->field.size() - 3 <= state->move.fromJ && state->move.fromJ < state->field.size() && 0 <= state->move.fromI && state->move.fromI < 3)
+            {
+                cost = MAX_COST - 1;
+                if (state->move.toI >= 3 || state->move.toJ < state->field.size() - 3) cost++;
+            }
+            //If one checker blocks other
+            if ((state->move.fromI == 3 && state->field[state->move.fromI - 1][state->move.fromJ] == type) || (state->move.fromJ == state->field.size() - 4 && state->field[state->move.fromI][state->move.fromJ + 1] == type))
+            {
+                cost = MAX_COST;
+            }
         }
     }
 
@@ -257,7 +287,7 @@ SolutionTree::Move SolutionTree::getMove(State *state)
     int index = 0;
     for (int i = 0; i < root->child.size(); ++i)
     {
-        if (root->child[i]->cost > cost)
+        if (root->child[i]->cost > cost || (root->child[i]->cost == cost && rand() % 2))
         {
             cost = root->child[i]->cost;
             index = i;
@@ -278,6 +308,38 @@ SolutionTree::Move SolutionTree::getMove(State *state)
     delete root;
 
     root = newState;
+
+    CellType type = Own;
+    int deltaRow = 0;
+    int deltaCol = 0;
+    for (int k = 0; k < 3; ++k)
+    {
+        int checkerAtRowCount = 0;
+        int checkerAtColCount = 0;
+        int allCount = 0;
+        if ((color == White && state->field[k][state->field.size() - k - 1] == type) || (color == Black && state->field[state->field.size() - k - 1][k] == type)) allCount--;
+
+        for (int i = k; i < state->field.size(); ++i)
+        {
+            if ((color == White && state->field[k][state->field.size() - 1 - i] == type) || (color == Black && state->field[state->field.size() - 1 - k][i] == type)) checkerAtRowCount++;
+            if ((color == White && state->field[i][state->field.size() - 1 - k] == type) || (color == Black && state->field[state->field.size() - 1 - i][k] == type)) checkerAtColCount++;
+        }
+
+        allCount += checkerAtColCount + checkerAtRowCount + deltaCol + deltaRow;
+        if (checkerAtColCount <= 3 - k + deltaCol && checkerAtRowCount <= 3 - k + deltaRow && allCount <= 5 - 2 * k + deltaCol + deltaRow)
+        {
+                deltaRow += 3 - k - checkerAtRowCount;
+                deltaCol += 3 - k - checkerAtColCount;
+        }
+        else
+        {
+            qDebug() << "bad move";
+            qDebug() << endl;
+            return move;
+        }
+    }
+    qDebug() << "good move";
+    qDebug() << endl;
 
     return move;
 
