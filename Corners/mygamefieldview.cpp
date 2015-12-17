@@ -28,6 +28,7 @@ int myGameFieldView::heightForWidth(int width) const
 void myGameFieldView::resizeEvent(QResizeEvent *event)
 {
     QGraphicsView::resizeEvent(event);
+
     double newFieldSize = qMin(event->size().width(), event->size().height());
     //Scales the all view to the new size:
     this->scale(newFieldSize / this->fieldSize, newFieldSize / this->fieldSize);

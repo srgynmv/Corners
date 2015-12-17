@@ -8,7 +8,9 @@ class Checker : public QGraphicsPixmapItem
 public:
     enum { Black = UserType + 1, White = UserType + 2 };
     Checker(QPixmap &pixmap);
+    void setScaledPixmap(int size);
 
+    QPixmap originalTexture;
 };
 
 class WhiteChecker : public Checker

@@ -70,15 +70,15 @@ void CornersGame::newGameClicked()
 
         //Converting from double to int
         int cellSize = gameFieldView->cellSize + 0.5;
-
-        whiteCheckerTexture = whiteCheckerTexture.scaled(cellSize, cellSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        blackCheckerTexture = blackCheckerTexture.scaled(cellSize, cellSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        qDebug() << cellSize;
 
         //Creating white and black checkers
         for (int i = 0; i < this->numberOfCheckers; ++i)
         {
             WhiteChecker *whiteChecker = new WhiteChecker(whiteCheckerTexture);
             BlackChecker *blackChecker = new BlackChecker(blackCheckerTexture);
+            whiteChecker->setScaledPixmap(cellSize);
+            blackChecker->setScaledPixmap(cellSize);
 
             if (whiteCheckers[i] == NULL)
             {
