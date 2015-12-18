@@ -67,7 +67,7 @@ public:
     Move getMove(State *state);
     int moveCost(State *state);
 
-    static const int TREE_SIZE = 5;
+    static const int TREE_SIZE = 3;
     static const int MAX_COST = 20;
     Color color;
     Difficulty difficulty;

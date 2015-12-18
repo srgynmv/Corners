@@ -94,17 +94,17 @@ QSet<SolutionTree::Move> SolutionTree::getAdditionalMoves(State *state, int i, i
         return result;
     }
 
-    CellType type = checkerColor == this->color ? Enemy : Own;
+    //CellType type = checkerColor == this->color ? Enemy : Own;
 
     if (checkerColor == White)
     {
-        if (canGoTo(state, ni - 1, nj) && state->field[ni - 1][nj] == type) result += getAdditionalMoves(state, i, j, ni - 2, nj, checkerColor, false);
-        if (canGoTo(state, ni, nj + 1) && state->field[ni][nj + 1] == type) result += getAdditionalMoves(state, i, j, ni, nj + 2, checkerColor, false);
+        if (canGoTo(state, ni - 1, nj) && state->field[ni - 1][nj] != None/*&& state->field[ni - 1][nj] == type*/) result += getAdditionalMoves(state, i, j, ni - 2, nj, checkerColor, false);
+        if (canGoTo(state, ni, nj + 1) && state->field[ni][nj + 1] != None/*&& state->field[ni][nj + 1] == type*/) result += getAdditionalMoves(state, i, j, ni, nj + 2, checkerColor, false);
     }
     else
     {
-        if (canGoTo(state, ni, nj - 1) && state->field[ni][nj - 1] == type) result += getAdditionalMoves(state, i, j, ni, nj - 2, checkerColor, false);
-        if (canGoTo(state, ni + 1, nj) && state->field[ni + 1][nj] == type) result += getAdditionalMoves(state, i, j, ni + 2, nj, checkerColor, false);
+        if (canGoTo(state, ni, nj - 1) && state->field[ni][nj - 1] != None/*&& state->field[ni][nj - 1] == type*/) result += getAdditionalMoves(state, i, j, ni, nj - 2, checkerColor, false);
+        if (canGoTo(state, ni + 1, nj) && state->field[ni + 1][nj] != None/*&& state->field[ni + 1][nj] == type*/) result += getAdditionalMoves(state, i, j, ni + 2, nj, checkerColor, false);
     }
 
     return result;
@@ -235,7 +235,17 @@ void SolutionTree::makeSolutionTree(State *state, int count)
         state->child.push_back(new State(state->field, !state->moveOfAI, *it, state->turnNumber + 1));
         state->child.last()->cost = moveCost(state->child.last());      //Making cost of move
         makeSolutionTree(state->child.last(), count - 1);
-
+        //Make minimax statement
+        if (state->cost < MAX_COST - 2 && state->cost != 0)
+        {
+            for (int i = 0; i < state->child.size(); ++i)
+            {
+                if (i == 0) state->cost = 1;
+                if (state->child[i]->cost == 0) continue;
+                if (state->moveOfAI) state->cost = qMax(state->cost, state->child[i]->cost);
+                else state->cost = qMin(state->cost, state->child[i]->cost);
+            }
+        }
         swap(state->field[it->fromI][it->fromJ], state->field[it->toI][it->toJ]);
     }
 

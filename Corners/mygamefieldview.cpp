@@ -103,16 +103,16 @@ void myGameFieldView::createAdditionalMoves(int i, int j, QVector<QGraphicsRectI
     if (white)
     {
         item = itemAtCell(i - 1, j);
-        if (item != NULL && item->type() == BlackChecker::Type) createAdditionalMoves(i - 2, j, result, white, false);
+        if (item != NULL && (item->type() == BlackChecker::Type || item->type() == WhiteChecker::Type)/*&& item->type() == BlackChecker::Type*/) createAdditionalMoves(i - 2, j, result, white, false);
         item = itemAtCell(i, j + 1);
-        if (item != NULL && item->type() == BlackChecker::Type) createAdditionalMoves(i, j + 2, result, white, false);
+        if (item != NULL && (item->type() == BlackChecker::Type || item->type() == WhiteChecker::Type)/*&& item->type() == BlackChecker::Type*/) createAdditionalMoves(i, j + 2, result, white, false);
     }
     else
     {
         item = itemAtCell(i, j - 1);
-        if (item != NULL && item->type() == WhiteChecker::Type) createAdditionalMoves(i, j - 2, result, white, false);
+        if (item != NULL && (item->type() == BlackChecker::Type || item->type() == WhiteChecker::Type)/*&& item->type() == WhiteChecker::Type*/) createAdditionalMoves(i, j - 2, result, white, false);
         item = itemAtCell(i + 1, j);
-        if (item != NULL && item->type() == WhiteChecker::Type) createAdditionalMoves(i + 2, j, result, white, false);
+        if (item != NULL && (item->type() == BlackChecker::Type || item->type() == WhiteChecker::Type)/*&& item->type() == WhiteChecker::Type*/) createAdditionalMoves(i + 2, j, result, white, false);
     }
 }
 //Checks can we go to i, j
@@ -177,8 +177,8 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
         QPointF clickPointF;
         clickPointF = this->mapToScene(clickPoint);
 
-        int checkerI = (clickPointF.y() + 1) / cellSize;
-        int checkerJ = (clickPointF.x() + 1) / cellSize;
+        int checkerI = (clickPointF.y() + 0.5) / cellSize;
+        int checkerJ = (clickPointF.x() + 0.5) / cellSize;
 
         if (itemAtCell(checkerI, checkerJ)->type() != WhiteChecker::Type && itemAtCell(checkerI, checkerJ)->type() != BlackChecker::Type)
         {
