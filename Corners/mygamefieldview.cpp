@@ -1,8 +1,8 @@
 #include "mygamefieldview.h"
 
+//Constructor with width and height
 myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView(), transparensy(50)
 {
-
     QSizePolicy policy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     policy.setHeightForWidth(true);
     this->setSizePolicy(policy);
@@ -20,11 +20,12 @@ myGameFieldView::myGameFieldView(int width, int height) : QGraphicsView(), trans
     checkerSelected = false;
 }
 
+//Reimplemented method that make height equal to width
 int myGameFieldView::heightForWidth(int width) const
 {
     return width;
 }
-
+//Make resize with keeping aspect ratio
 void myGameFieldView::resizeEvent(QResizeEvent *event)
 {
     QGraphicsView::resizeEvent(event);
@@ -34,7 +35,7 @@ void myGameFieldView::resizeEvent(QResizeEvent *event)
     this->scale(newFieldSize / this->fieldSize, newFieldSize / this->fieldSize);
     this->fieldSize = newFieldSize;
 }
-
+//Clean field from moves
 void myGameFieldView::erasePossibleMoves()
 {
     for (int i = 0; i < selectionItems.size(); ++i)
@@ -43,12 +44,12 @@ void myGameFieldView::erasePossibleMoves()
     }
     selectionItems.resize(0);
 }
-
+//Return pointer to item at cell(i, j)
 QGraphicsItem* myGameFieldView::itemAtCell(int i, int j)
 {
     return this->itemAt(mapFromScene(j * cellSize + cellSize / 2, i * cellSize + cellSize / 2));
 }
-
+//Put rectangle at [i,j], true - if successfully, otherwise - false
 bool myGameFieldView::putRect(int i, int j, QVector<QGraphicsRectItem *> &result)
 {
     if (!canGoTo(i, j))
@@ -70,6 +71,7 @@ bool myGameFieldView::putRect(int i, int j, QVector<QGraphicsRectItem *> &result
     }
 }
 
+//Making a green rects at field
 QVector<QGraphicsRectItem *> myGameFieldView::createPossibleMoves(int checkerI, int checkerJ, bool white)
 {
     QVector<QGraphicsRectItem *> result;
@@ -88,7 +90,7 @@ QVector<QGraphicsRectItem *> myGameFieldView::createPossibleMoves(int checkerI, 
     createAdditionalMoves(checkerI, checkerJ, result, white, true);
     return result;
 }
-
+//Allows jumping throught checkers
 void myGameFieldView::createAdditionalMoves(int i, int j, QVector<QGraphicsRectItem *> &result, bool white, bool firstRectangle)
 {
     bool rectangleAdded = putRect(i, j, result);
@@ -113,7 +115,7 @@ void myGameFieldView::createAdditionalMoves(int i, int j, QVector<QGraphicsRectI
         if (item != NULL && item->type() == WhiteChecker::Type) createAdditionalMoves(i + 2, j, result, white, false);
     }
 }
-
+//Checks can we go to i, j
 bool myGameFieldView::canGoTo(int i, int j)
 {
    if (i >= 0 && i < rowAndColumnCount && j >= 0 && j < rowAndColumnCount)
@@ -126,6 +128,7 @@ bool myGameFieldView::canGoTo(int i, int j)
    }
 }
 
+//Returns true, if any checker of this color can make move
 bool myGameFieldView::canMakeMove(QString color)
 {
     //Making invisible green rects to make move count
@@ -152,15 +155,17 @@ bool myGameFieldView::canMakeMove(QString color)
         return false;
     }
 }
-
+//Making doubleclick like once click
 void myGameFieldView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     mousePressEvent(event);
 }
 
+//Reimplementing once click event:
 void myGameFieldView::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsView::mousePressEvent(event);
+    //If player clicked on green rectangle
     if (checkerSelected && this->itemAt(event->x(), event->y())->type() == QGraphicsRectItem::Type)
     {
         //Checking clicked cell
@@ -188,7 +193,7 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
         //Deleting all possible moves from field
         checkerSelected = false;
         erasePossibleMoves();
-
+        //If player clicked on his checker, print rectangles
         if (this->itemAt(event->x(), event->y())->flags() == QGraphicsItem::ItemIsSelectable &&
                 (this->itemAt(event->x(), event->y())->type() == Checker::White || this->itemAt(event->x(), event->y())->type() == Checker::Black))
         {
@@ -213,10 +218,11 @@ void myGameFieldView::mousePressEvent(QMouseEvent *event)
     }
 }
 
+//Update view on screen
 void myGameFieldView::updateView(QEventLoop *loop)
 {
     //Start timer 50ms and call loop->quit() after timeout
     QTimer::singleShot(50, loop, SLOT(quit()));
-    //Force main thread to sleep and wakeUp a gameFieldView
+    //Force main thread to sleep and wake up a gameFieldView
     loop->exec();
 }

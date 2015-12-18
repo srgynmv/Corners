@@ -4,6 +4,11 @@
 #include <QtWidgets>
 #include <QtDebug>
 
+/* SolutionTree class fully describes the game of the bot by constructing
+ * a solution tree. Within the class describes the basic classes for storage and
+ * and transfer of move coordinates and class describing the state of the game
+ * (position of checkers, who are making turn, etc.)
+ */
 class SolutionTree
 {
     friend class GameProcess;

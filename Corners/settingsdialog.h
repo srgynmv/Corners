@@ -6,7 +6,9 @@
 namespace Ui {
 class SettingsDialog;
 }
-
+/* Class that can get settings from player
+ * and save it.
+ */
 class SettingsDialog : public QDialog
 {
     Q_OBJECT

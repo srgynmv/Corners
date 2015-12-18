@@ -3,6 +3,9 @@
 #include <QtWidgets>
 #include <QtDebug>
 
+/* This class provides a quick access to graphics item
+ */
+
 class Checker : public QGraphicsPixmapItem
 {
 public:

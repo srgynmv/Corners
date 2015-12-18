@@ -7,6 +7,7 @@ namespace Ui {
 class ExitDialog;
 }
 
+//Basic dialog that can ask about exit
 class ExitDialog : public QDialog
 {
     Q_OBJECT

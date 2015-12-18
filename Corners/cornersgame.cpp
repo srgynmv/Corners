@@ -12,7 +12,7 @@ CornersGame::CornersGame(QWidget *parent) :
     QPixmap fieldTexture(":/textures/resources/fieldTexture.png");
     QGraphicsPixmapItem *fieldTextureItem = new QGraphicsPixmapItem(fieldTexture);
     QBrush backgroundBrush(QImage(":/textures/resources/backgroundTexture.png"));
-
+    //Making new gameFieldView
     gameFieldView = new myGameFieldView(fieldTexture.width(), fieldTexture.height());
     gameFieldView->setBackgroundBrush(backgroundBrush);
 
@@ -38,7 +38,10 @@ CornersGame::CornersGame(QWidget *parent) :
     {
         whiteCheckers[i] = blackCheckers[i] = NULL;
     }
+
+    //Setup info label
     ui->infoLabel->setText("");
+    ui->infoLabel->setVisible(false);
 
     newGameDialog = new NewGameDialog;
     settingsDialog = new SettingsDialog;
@@ -54,10 +57,9 @@ CornersGame::CornersGame(QWidget *parent) :
     //Setup window settings
     setWindowTitle("Corners");
     setWindowIcon(QIcon(":/textures/resources/icon.png"));
-
-    ui->infoLabel->setVisible(false);
 }
 
+//If we click on new game button, program will call this slot
 void CornersGame::newGameClicked()
 {
     ui->infoLabel->setVisible(true);
@@ -70,7 +72,6 @@ void CornersGame::newGameClicked()
 
         //Converting from double to int
         int cellSize = gameFieldView->cellSize + 0.5;
-        qDebug() << cellSize;
 
         //Creating white and black checkers
         for (int i = 0; i < this->numberOfCheckers; ++i)
@@ -92,6 +93,7 @@ void CornersGame::newGameClicked()
             }
         }
 
+        //If game is not started:
         if (gameProcess == NULL)
         {
             gameProcess = new GameProcess(this);
@@ -100,7 +102,6 @@ void CornersGame::newGameClicked()
         }
         else
         {
-            //newGameStarted = true;
             gameProcess->resetGame();
             gameProcess->game();
         }
@@ -110,14 +111,13 @@ void CornersGame::newGameClicked()
         //Out asking dialog about new game
         if (newGameDialog->exec())
         {
-            //TODO...:
-            //Update scene, matrix, etc.
             newGameStarted = true;
             gameProcess->resetGame();
         }
     }
 }
 
+//Constructor of GameProcess class
 GameProcess::GameProcess(CornersGame* parent)
 {
     this->loop = new QEventLoop;
@@ -130,6 +130,7 @@ GameProcess::GameProcess(CornersGame* parent)
     QObject::connect(parent, SIGNAL(updateView(QEventLoop*)), parent->gameFieldView, SLOT(updateView(QEventLoop*)));
 }
 
+//Reseting all parameters to the start state
 void GameProcess::resetGame()
 {
     //Stop QEventLoop if it working
@@ -161,7 +162,7 @@ void GameProcess::resetGame()
         blackCheckerPlayer = new Player(Player::HUMAN, parent->settingsDialog->blackPlayerName(), "black");
     }
 
-    //Making new turn
+    //Making first turn, decide who starts
     currentPlayer = (rand() % 2) ? whiteCheckerPlayer : blackCheckerPlayer;
     qDebug() << "First turn of : " << currentPlayer->name();
     swapSelectionMode();
@@ -185,6 +186,7 @@ void GameProcess::resetGame()
 
 }
 
+//Making new field for current state
 QVector<QVector<SolutionTree::CellType> > GameProcess::getStateField()
 {
     QVector<QVector<SolutionTree::CellType> > result(parent->gameFieldView->rowAndColumnCount, QVector<SolutionTree::CellType> (parent->gameFieldView->rowAndColumnCount, SolutionTree::None));
@@ -205,10 +207,11 @@ QVector<QVector<SolutionTree::CellType> > GameProcess::getStateField()
     return result;
 }
 
+//Getting move from player or AI solution tree
 void GameProcess::getMove()
 {
+    //Changing selection mode because we need or not need to click on checkers
     swapSelectionMode();
-    //qDebug() << "In getMove()";
     if (currentPlayer->type() == Player::HUMAN)
     {
         qDebug() << "Getting move from player...";
@@ -217,6 +220,8 @@ void GameProcess::getMove()
     }
     else
     {
+        //Sending current state to the tree and getting the new move of tree
+
         qDebug() << "Getting move from AI...";
         SolutionTree::State *state = new SolutionTree::State(getStateField());
         SolutionTree::Move move = currentPlayer->getMoveFromAI(state);
@@ -225,17 +230,17 @@ void GameProcess::getMove()
     }
 }
 
+//Setup selection parameter, we can select the item, if player is a human and it's a player's move
 void GameProcess::swapSelectionMode()
 {
     for (int i = 0; i < parent->numberOfCheckers; ++i)
     {
-        //Setup selection
-
         parent->whiteCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, currentPlayer == whiteCheckerPlayer && whiteCheckerPlayer->type() == Player::HUMAN);
         parent->blackCheckers[i]->setFlag(QGraphicsItem::ItemIsSelectable, currentPlayer == blackCheckerPlayer && blackCheckerPlayer->type() == Player::HUMAN);
     }
 }
 
+//Check field for game end
 bool GameProcess::canContinueGame()
 {
     if (parent->exitDialog->result() == QDialog::Accepted)
@@ -250,7 +255,7 @@ bool GameProcess::canContinueGame()
     int blackAtHomeCount = 0;
 
     qDebug() << endl << "CONTINUE_GAME" << endl;
-
+    //Checking homes
     for (int i = 0; i < parent->numberOfCheckers; ++i)
     {
         int blackI = i % 3;
@@ -303,7 +308,7 @@ bool GameProcess::canContinueGame()
 
     return true;
 }
-
+//Slot that provides a game loop
 void GameProcess::game()
 {
     qDebug() << "Started new game() func";
@@ -315,9 +320,9 @@ void GameProcess::game()
         parent->repaint();
         getMove();
 
-        //TODO: Update view
         emit parent->updateView(loop);
 
+        //If new game started, game need to miss last move
         if (parent->newGameStarted)
         {
             parent->newGameStarted = false;
@@ -326,7 +331,7 @@ void GameProcess::game()
 
         parent->gameRunning = canContinueGame();
         if (!parent->gameRunning) break;
-
+        //Give turn to other player
         currentPlayer = (currentPlayer == blackCheckerPlayer) ? whiteCheckerPlayer : blackCheckerPlayer;
         turnCounter++;
 
@@ -337,17 +342,21 @@ void GameProcess::game()
 
 }
 
+//Prints information about winner
 void GameProcess::winnerIs(SolutionTree::Color color)
 {
     QString info;
 
     if (color == SolutionTree::White)
     {
-        info = "Winner is white!";
+        info = "Winner is white!\n";
+        info += "(" + whiteCheckerPlayer->name() + ")";
+
     }
     else if (color == SolutionTree::Black)
     {
-        info = "Winner is black!";
+        info = "Winner is black!\n";
+        info += "(" + blackCheckerPlayer->name() + ")";
     }
     else
     {

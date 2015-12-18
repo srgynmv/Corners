@@ -5,6 +5,10 @@
 #include <checker.h>
 #include <QtDebug>
 
+/* This class makes a visualization of game process.
+ * There are a methods for analyzing position of checkers,
+ * printing possible moves, handling clicks.
+ */
 class myGameFieldView  : public QGraphicsView
 {
     Q_OBJECT
@@ -34,7 +38,6 @@ public:
     QVector<QGraphicsRectItem *> createPossibleMoves(int checkerI, int checkerJ, bool white);
     void createAdditionalMoves(int i, int j, QVector<QGraphicsRectItem *> &result, bool white, bool firstRectangle);
     void erasePossibleMoves();
-
 
     double fieldSize;
     double cellSize;

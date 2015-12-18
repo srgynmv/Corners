@@ -6,7 +6,7 @@
 namespace Ui {
 class NewGameDialog;
 }
-
+//Dialog that asking about starting new game
 class NewGameDialog : public QDialog
 {
     Q_OBJECT

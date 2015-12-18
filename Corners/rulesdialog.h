@@ -6,7 +6,7 @@
 namespace Ui {
 class RulesDialog;
 }
-
+//Class that shows dialog that prints rules
 class RulesDialog : public QDialog
 {
     Q_OBJECT
