@@ -335,7 +335,7 @@ void GameProcess::game()
         currentPlayer = (currentPlayer == blackCheckerPlayer) ? whiteCheckerPlayer : blackCheckerPlayer;
         turnCounter++;
 
-        info = "Turn #" + QString::number(turnCounter) + "\n\n";
+        info = "Turn #" + QString::number((turnCounter + 1)/ 2) + "\n\n";
         info += "Turn of: " + currentPlayer->color() + " (" + currentPlayer->name() + ")";
         parent->ui->infoLabel->setText(info);
     }

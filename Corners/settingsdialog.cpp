@@ -12,6 +12,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     this->playingWithComputer = ui->computerRadioButton->isChecked();
     QObject::connect(ui->playerRadioButton, SIGNAL(clicked(bool)), this, SLOT(changeDifficulty()));
     QObject::connect(ui->computerRadioButton, SIGNAL(clicked(bool)), this, SLOT(changeDifficulty()));
+    QObject::connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(close()));
 }
 
 //Enable and disable some of buttons in settings

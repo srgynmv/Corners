@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>228</width>
-    <height>399</height>
+    <height>434</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -94,7 +94,6 @@
          </widget>
         </item>
        </layout>
-       <zorder>verticalLayoutWidget</zorder>
        <zorder>playersNameLabel</zorder>
        <zorder>whitePlayerName</zorder>
        <zorder>blackPlayerName</zorder>
@@ -224,6 +223,16 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

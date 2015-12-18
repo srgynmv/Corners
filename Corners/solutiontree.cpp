@@ -152,18 +152,18 @@ int SolutionTree::moveCost(State* state)
     //Making a non-zero cost that depends on difficulty
     if (difficulty == Easy)
     {
-        cost = rand() % (MAX_COST / 4) + 1;
+        cost = rand() % (MAX_COST / 5) + 1;
     }
     if (difficulty == Medium)
     {
         if (!(rand() % 4))
         {
             cost = (sqrt((state->move.fromI - state->move.toI) * (state->move.fromI - state->move.toI) + (state->move.fromJ - state->move.toJ) * (state->move.fromJ - state->move.toJ)));
-            cost = cost * 4;
+            cost *= 4;
         }
         else
         {
-            cost = rand() % (MAX_COST / 4) + 1;
+            cost = rand() % (MAX_COST / 5) + 1;
         }
     }
     if (difficulty == Hard)
@@ -246,6 +246,7 @@ void SolutionTree::makeSolutionTree(State *state, int count)
                 else state->cost = qMin(state->cost, state->child[i]->cost);
             }
         }
+
         swap(state->field[it->fromI][it->fromJ], state->field[it->toI][it->toJ]);
     }
 
